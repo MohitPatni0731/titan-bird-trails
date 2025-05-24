@@ -1,174 +1,192 @@
-// src/pages/Index.tsx
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronDown, MapPin, Clock, Bird, Camera, X, ArrowRight, CheckCircle, Circle, Star, MessageSquare, Feather, Send, Sparkles, BotMessageSquare, Loader2, Brain, Info, ShieldQuestion, ListChecks, PlayCircle, PauseCircle, StopCircle, Eye } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronDown, MapPin, Clock, Bird, Camera, Filter, X, ArrowRight, CheckCircle, Circle, Star, MessageSquare, Feather, Send, Sparkles, BotMessageSquare, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 
 // !! IMPORTANT SECURITY WARNING !!
 // Do NOT use API keys directly in frontend code for production applications.
 // This is for demonstration purposes ONLY.
+// In a real application, this key should be kept on a secure backend server,
+// and your frontend should make requests to your backend, which then calls the Gemini API.
 const GEMINI_API_KEY = "AIzaSyAhgRnn_yJhbuiaQcoZMppaY8LnpItmdgI"; // User-provided API key
-
-const formatTime = (totalSeconds) => {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
 
 const Index = () => {
   const [activeFilter, setActiveFilter] = useState('all');
-  const [selectedTourDetails, setSelectedTourDetails] = useState(null);
+  const [selectedTour, setSelectedTour] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  
-  const [tourSpecificChecklistBirds, setTourSpecificChecklistBirds] = useState([]);
+  const [showChecklist, setShowChecklist] = useState(false);
   const [checkedBirds, setCheckedBirds] = useState(new Set());
-  const [showActiveTourModal, setShowActiveTourModal] = useState(false);
-  const [activeTourModalView, setActiveTourModalView] = useState('checklist'); 
-  
-  const [currentGuidedTour, setCurrentGuidedTour] = useState(null);
-  const [isGuidedTourActive, setIsGuidedTourActive] = useState(false);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [tourStartTime, setTourStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const timerIntervalIdRef = useRef(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
+  // AI Feature States
   const [selectedBirdForChat, setSelectedBirdForChat] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [currentUserMessage, setCurrentUserMessage] = useState("");
   const [isAiRespondingChat, setIsAiRespondingChat] = useState(false);
   const chatContainerRef = useRef(null);
+
+  const [selectedBirdForPoem, setSelectedBirdForPoem] = useState(null);
+  const [generatedPoem, setGeneratedPoem] = useState("");
+  const [isAiGeneratingPoem, setIsAiGeneratingPoem] = useState(false);
   
   const [aiError, setAiError] = useState(null);
 
-  const [tourPreferences, setTourPreferences] = useState("");
-  const [recommendedTour, setRecommendedTour] = useState(null);
-  const [isAiRecommendingTour, setIsAiRecommendingTour] = useState(false);
-
-  const [selectedBirdForFact, setSelectedBirdForFact] = useState(null);
-  const [birdFact, setBirdFact] = useState("");
-  const [isAiFetchingFact, setIsAiFetchingFact] = useState(false);
-
-  const [ethicsQuery, setEthicsQuery] = useState("");
-  const [ethicsAdvice, setEthicsAdvice] = useState("");
-  const [isAiAdvisingEthics, setIsAiAdvisingEthics] = useState(false);
 
   const tours = [
     {
       id: 1,
-      title: "Arboretum Dawn Chorus",
-      subtitle: "Peaceful morning birding",
+      title: "Morning Birds",
+      subtitle: "Arboretum Dawn",
       time: "7:00 AM",
-      duration: "1.5h",
+      duration: "2h",
       difficulty: "Easy",
-      species: ["American Robin", "Mourning Dove", "Anna's Hummingbird", "Western Bluebird"],
-      image: "https://images.unsplash.com/photo-1530905353130-af967535a19f?w=800&auto=format&fit=crop&q=70",
+      species: ["Red-tailed Hawk", "Anna's Hummingbird", "American Robin"],
+      image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800",
       category: "morning",
-      color: "from-yellow-200 to-orange-300", // Softer morning colors
-      description: "Greet the day with the Arboretum's earliest singers. A gentle walk perfect for all levels, focusing on common species and bird song identification.",
+      color: "from-amber-400 to-orange-500",
+      description: "Experience the tranquility of dawn in the Arboretum and witness the early morning activities of various bird species. Ideal for beginners and early risers.",
       details: {
-        meetingPoint: "Arboretum Main Entrance",
-        guide: "Dr. Ava Chen",
-        focus: "Bird song basics, identifying common garden birds, and enjoying the morning light.",
-        whatToBring: ["Binoculars", "Water", "Comfortable shoes", "Notepad (optional)"]
-      },
-      guidedSteps: [
-        { text: "Welcome! We'll start at the Arboretum entrance. Take a moment to listen – many birds are most vocal now.", locationHint: "Arboretum Entrance" },
-        { text: "Let's walk towards the botanical gardens. Keep an eye out for American Robins on the lawns and Anna's Hummingbirds near nectar-rich flowers.", locationHint: "Botanical Gardens Path" },
-        { text: "The mature trees here often shelter Western Bluebirds. Look for their bright blue plumage.", locationHint: "Oak Grove" },
-        { text: "Near the pond, listen for the soft cooing of Mourning Doves. This is a good spot for quiet observation.", locationHint: "Arboretum Pond" },
-        { text: "Our guided walk concludes here. Feel free to continue exploring or review your checklist!", locationHint: "Tour End / Pond" }
-      ]
+        meetingPoint: "Arboretum Entrance",
+        guide: "Dr. Emily Carter",
+        focus: "Identifying common local birds by sight and sound, understanding morning bird behaviors.",
+        whatToBring: ["Binoculars", "Water bottle", "Comfortable walking shoes", "Light jacket"]
+      }
     },
     {
       id: 2,
-      title: "Campus Quad Raptors",
-      subtitle: "Urban hunters overhead",
+      title: "Campus Central",
+      subtitle: "Urban Wildlife",
       time: "2:00 PM",
-      duration: "1h",
-      difficulty: "Easy",
-      species: ["Red-tailed Hawk", "Cooper's Hawk", "American Robin"],
-      image: "https://images.unsplash.com/photo-1588392382834-a891154bca4d?w=800&auto=format&fit=crop&q=70",
+      duration: "2h",
+      difficulty: "Moderate",
+      species: ["Cooper's Hawk", "Mourning Dove", "Western Bluebird"],
+      image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=800",
       category: "afternoon",
-      color: "from-sky-200 to-cyan-300",
-      description: "Discover the raptors that hunt above the busy campus center. This tour focuses on identifying hawks and understanding their urban adaptations.",
+      color: "from-blue-400 to-indigo-500",
+      description: "Explore the surprising biodiversity in the heart of the campus. This tour focuses on birds adapted to urban environments.",
       details: {
-        meetingPoint: "Library Front Steps",
-        guide: "Prof. Ben Miller",
-        focus: "Raptor identification, observing hunting behaviors, urban bird ecology.",
-        whatToBring: ["Binoculars", "Sunscreen", "Hat"]
-      },
-      guidedSteps: [
-        { text: "We begin at the Library steps. Scan the sky and the tops of tall buildings for soaring Red-tailed Hawks.", locationHint: "Library Steps" },
-        { text: "Walk through the main Quad. Cooper's Hawks are more agile and may be seen darting between trees or buildings.", locationHint: "Campus Quad" },
-        { text: "The open lawns can attract American Robins, which in turn can attract hawks. Observe any interactions carefully.", locationHint: "Grassy Areas" },
-        { text: "This concludes our raptor watch. Keep your eyes peeled, they can appear anywhere!", locationHint: "Tour End / Quad" }
-      ]
+        meetingPoint: "University Library Fountain",
+        guide: "Prof. Alex Chen",
+        focus: "Observing raptors, identifying common campus birds, and learning about urban bird ecology.",
+        whatToBring: ["Binoculars", "Sunscreen", "Hat", "Water bottle"]
+      }
     },
-     {
+    {
       id: 3,
-      title: "Sunset Wetlands Stroll",
-      subtitle: "Evening bird activity",
+      title: "Evening Migration",
+      subtitle: "Sunset Flight",
       time: "5:30 PM",
-      duration: "1.5h",
+      duration: "2h",
       difficulty: "Easy",
-      species: ["Great Blue Heron", "Red-winged Blackbird", "Mourning Dove"],
-      image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=800&auto=format&fit=crop&q=70",
+      species: ["Great Blue Heron", "Red-winged Blackbird"],
+      image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800",
       category: "evening",
-      color: "from-indigo-200 to-purple-300",
-      description: "A relaxing walk around the campus wetlands area as birds prepare for nightfall. Ideal for spotting herons and blackbirds.",
+      color: "from-purple-400 to-pink-500",
+      description: "Witness the beauty of birds preparing for the night and possibly spot some migratory species during sunset.",
       details: {
-        meetingPoint: "Student Rec Center Entrance",
-        guide: "Jessica Lee",
-        focus: "Identifying wetland birds, observing roosting behaviors, enjoying the sunset.",
-        whatToBring: ["Binoculars", "Light jacket", "Insect repellent (optional)"]
-      },
-       guidedSteps: [
-        { text: "Starting at the Rec Center, we'll head towards the campus wetlands.", locationHint: "Rec Center" },
-        { text: "Listen for the calls of Red-winged Blackbirds as they settle in the reeds for the evening.", locationHint: "Wetlands Edge" },
-        { text: "Patiently observe the water's edge for a Great Blue Heron, often seen hunting at dusk.", locationHint: "Pond Overlook" },
-        { text: "As the sun sets, notice how bird activity changes. Mourning Doves may make their last flights of the day.", locationHint: "Sunset Viewing Spot" },
-        { text: "Our evening stroll ends here. Enjoy the peaceful campus sounds.", locationHint: "Tour End / Wetlands Path" }
-      ]
+        meetingPoint: "Titan Stadium West Entrance",
+        guide: "Jessica Miller",
+        focus: "Identifying birds active during dusk, learning about roosting behaviors and migratory patterns.",
+        whatToBring: ["Binoculars", "Camera", "Warm layer", "Insect repellent"]
+      }
     }
   ];
-  
-  const allCampusBirds = [ 
-    { name: "American Robin", image: "https://images.unsplash.com/photo-1544928140-701ef7385f9a?w=400&auto=format&fit=crop&q=60", description: "Orange-breasted songbird, often seen on lawns." },
-    { name: "Mourning Dove", image: "https://images.unsplash.com/photo-1550853024-fae8cd405141?w=400&auto=format&fit=crop&q=60", description: "Gentle gray dove with a soft cooing call." },
-    { name: "Anna's Hummingbird", image: "https://images.unsplash.com/photo-1518992028580-6d57bd80f2dd?w=400&auto=format&fit=crop&q=60", description: "Tiny, iridescent green bird with rapid wing beats." },
-    { name: "Western Bluebird", image: "https://images.unsplash.com/photo-1606567590439-a905409286a8?w=400&auto=format&fit=crop&q=60", description: "Brilliant blue bird with an orange breast." },
-    { name: "Red-tailed Hawk", image: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&auto=format&fit=crop&q=60", description: "Large raptor with a distinctive reddish-brown tail." },
-    { name: "Cooper's Hawk", image: "https://images.unsplash.com/photo-1531306728370-e2ebd904bb92?w=400&auto=format&fit=crop&q=60", description: "Medium-sized hawk with rounded wings, agile hunter." },
-    { name: "Great Blue Heron", image: "https://images.unsplash.com/photo-1518404869630-0ac09328786c?w=400&auto=format&fit=crop&q=60", description: "Tall, long-legged wading bird, often seen near water." },
-    { name: "Red-winged Blackbird", image: "https://images.unsplash.com/photo-1590055008589-a34ba8700919?w=400&auto=format&fit=crop&q=60", description: "Black bird with striking red and yellow shoulder patches." }
+
+  const birdSpecies = [
+    { name: "Red-tailed Hawk", image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400", description: "Large raptor with distinctive red tail", funFact: "Red-tailed Hawks have incredible eyesight, about 8 times sharper than humans!" },
+    { name: "Anna's Hummingbird", image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400", description: "Iridescent green bird with rapid wing beats", funFact: "Anna's Hummingbirds can fly backwards and even upside down for short periods!" },
+    { name: "American Robin", image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400", description: "Orange-breasted songbird, common year-round", funFact: "American Robins are often a sign of spring, but many stay in their northern territories year-round." },
+    { name: "Cooper's Hawk", image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400", description: "Medium-sized hawk with rounded wings", funFact: "Cooper's Hawks are skilled hunters, often ambushing smaller birds in dense vegetation." },
+    { name: "Mourning Dove", image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400", description: "Gentle gray dove with soft cooing call", funFact: "The cooing sound of a Mourning Dove is often mistaken for an owl." },
+    { name: "Western Bluebird", image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400", description: "Brilliant blue bird with orange breast", funFact: "Western Bluebirds often nest in tree cavities or birdhouses." }
   ];
 
-  useEffect(() => {
-    if (isGuidedTourActive && tourStartTime) {
-      timerIntervalIdRef.current = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - tourStartTime) / 1000));
-      }, 1000);
+  const callGeminiAPI = async (promptText) => {
+    setAiError(null);
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Gemini API Error:", errorData);
+        throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+        return data.candidates[0].content.parts[0].text;
+      } else {
+        console.error("Unexpected API response structure:", data);
+        throw new Error("Could not extract text from API response.");
+      }
+    } catch (error) {
+      console.error("Error calling Gemini API:", error);
+      setAiError(error.message);
+      return null;
+    }
+  };
+  
+  const handleSendMessage = async () => {
+    if (!currentUserMessage.trim() || !selectedBirdForChat) return;
+
+    const userMsg = { sender: 'user', text: currentUserMessage };
+    setChatMessages(prev => [...prev, userMsg]);
+    setCurrentUserMessage("");
+    setIsAiRespondingChat(true);
+
+    const bird = birdSpecies.find(b => b.name === selectedBirdForChat);
+    const prompt = `You are a ${bird.name}, a bird known for being a ${bird.description}. A user is talking to you. Respond to their message: "${userMsg.text}". Stay in character as the bird. Be friendly, a little witty, and incorporate facts about your species (like your diet, habitat, sounds, or behavior) naturally into the conversation. Keep your responses relatively short, like a chat. If the user asks something you wouldn't know (like complex human affairs), politely say you're just a bird and don't know much about that.`;
+    
+    const aiResponseText = await callGeminiAPI(prompt);
+
+    if (aiResponseText) {
+      setChatMessages(prev => [...prev, { sender: 'ai', text: aiResponseText }]);
     } else {
-      clearInterval(timerIntervalIdRef.current);
+      setChatMessages(prev => [...prev, { sender: 'ai', text: "Chirp... I seem to be having trouble thinking right now. Try again in a moment!" }]);
     }
-    return () => clearInterval(timerIntervalIdRef.current);
-  }, [isGuidedTourActive, tourStartTime]);
+    setIsAiRespondingChat(false);
+  };
 
-  const callGeminiAPI = async (promptText) => { /* ... (same as before) ... */ };
-  const handleSendMessage = async () => { /* ... (same as before) ... */ };
-  const handleRecommendTour = async () => { /* ... (same as before, ensure prompt is updated if tour descriptions change) ... */ };
-  const handleFetchBirdFact = async () => { /* ... (same as before) ... */ };
-  const handleGetEthicsAdvice = async () => { /* ... (same as before) ... */ };
+  const handleGeneratePoem = async () => {
+    if (!selectedBirdForPoem) return;
+    setIsAiGeneratingPoem(true);
+    setGeneratedPoem("");
+    
+    const bird = birdSpecies.find(b => b.name === selectedBirdForPoem);
+    const prompt = `Create a short, evocative, and delightful 4 to 8 line poem about the ${bird.name}, which is known as a ${bird.description}. Capture its spirit and beauty.`;
+    
+    const poemText = await callGeminiAPI(prompt);
+
+    if (poemText) {
+      setGeneratedPoem(poemText);
+    } else {
+      setGeneratedPoem("My muse seems to have flown off... Please try again!");
+    }
+    setIsAiGeneratingPoem(false);
+  };
   
   useEffect(() => {
-    if (chatContainerRef.current) chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [chatMessages]);
+
 
   const filterTours = (category) => {
     if (category === 'all') return tours;
@@ -176,143 +194,96 @@ const Index = () => {
   };
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const yOffset = -70; // Adjusted for nav height
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({top: y, behavior: 'smooth'});
-    }
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     setIsMenuOpen(false);
-  };
-
-  const openActiveTourModalWithChecklist = (tour) => {
-    setSelectedTourDetails(null); 
-    setCurrentGuidedTour(tour); 
-    const checklistBirds = allCampusBirds.filter(bird => tour.species.includes(bird.name));
-    setTourSpecificChecklistBirds(checklistBirds);
-    setCheckedBirds(new Set()); 
-    setActiveTourModalView('checklist');
-    setShowActiveTourModal(true);
-    setIsGuidedTourActive(false); 
-    setElapsedTime(0);
-    clearInterval(timerIntervalIdRef.current);
-  };
-
-  const startGuidedTour = () => {
-    if (!currentGuidedTour) return;
-    setActiveTourModalView('guide');
-    setIsGuidedTourActive(true);
-    setCurrentStepIndex(0);
-    setTourStartTime(Date.now());
-    setElapsedTime(0);
-  };
-
-  const endGuidedTour = () => {
-    setIsGuidedTourActive(false);
-    clearInterval(timerIntervalIdRef.current);
-    setActiveTourModalView('checklist'); 
-  };
-
-  const nextStep = () => {
-    if (currentGuidedTour && currentStepIndex < currentGuidedTour.guidedSteps.length - 1) {
-      setCurrentStepIndex(prev => prev + 1);
-    }
-  };
-  const prevStep = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1);
-    }
   };
 
   const toggleBirdCheck = (birdName) => {
     const newChecked = new Set(checkedBirds);
-    if (newChecked.has(birdName)) newChecked.delete(birdName);
-    else newChecked.add(birdName);
+    if (newChecked.has(birdName)) {
+      newChecked.delete(birdName);
+    } else {
+      newChecked.add(birdName);
+    }
     setCheckedBirds(newChecked);
   };
 
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
+      
       const sections = document.querySelectorAll('[data-animate]');
       sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.75) { // Trigger animation a bit earlier
-          section.classList.add('animate-fade-in-up'); 
+        if (rect.top < window.innerHeight * 0.8) {
+          section.classList.add('animate-fade-in');
         }
       });
     };
+
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
-  // Minimal feathers for subtle effect, if any. Can be removed if still causing lag.
-  const feathers = React.useMemo(() => Array.from({ length: 4 }).map((_, i) => ({
-    id: i,
-    style: {
-      left: `${Math.random() * 100}%`,
-      animationDuration: `${Math.random() * 10 + 15}s`, 
-      animationDelay: `${Math.random() * 10}s`,
-      width: `${Math.random() * 5 + 5}px`, 
-      height: `${Math.random() * 10 + 10}px`,
-      '--direction-x': (Math.random() > 0.5 ? 0.5 : -0.5), // Slower horizontal movement
-      '--direction-rot': (Math.random() > 0.5 ? 0.5 : -0.5), // Less rotation
-    }
-  })), []);
-
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden relative selection:bg-primary/20 dark:selection:bg-primary/30">
-      {/* Subtle decorative elements - can be removed if performance is still an issue */}
-      {/* <div className="aurora-background fixed inset-0 z-[-1]">
-        <div></div><div></div><div></div>
-      </div> */}
-      {/* <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {feathers.map(feather => (
-          <Feather key={feather.id} className="floating-feather text-border/30 dark:text-border/20" style={feather.style as React.CSSProperties} />
-        ))}
-      </div> */}
+    <div className="min-h-screen bg-white overflow-hidden relative">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Floating elements... */}
+      </div>
 
-      <nav className="fixed top-0 w-full bg-background/80 dark:bg-background/80 backdrop-blur-md z-50 border-b border-border/70 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5"> {/* Reduced padding */}
+      <nav className="fixed top-0 w-full bg-white/70 backdrop-blur-2xl z-50 border-b border-white/20 shadow-lg shadow-black/5">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2 group cursor-pointer" onClick={() => scrollToSection('hero')}>
-              <div className="p-1.5 rounded-full group-hover:bg-primary/10 transition-colors">
-                <Bird className="h-7 w-7 text-primary transition-all duration-300 group-hover:scale-110" />
+            <div className="flex items-center space-x-4 group">
+              <div className="relative">
+                <Bird className="h-8 w-8 text-gray-800 transition-all duration-700 group-hover:scale-125 group-hover:rotate-12" />
+                <div className="absolute -inset-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-full opacity-0 group-hover:opacity-40 transition-all duration-500 blur-sm"></div>
               </div>
-              <span className="text-lg font-medium text-foreground tracking-tight group-hover:text-primary transition-colors">Titan Bird Trails</span>
+              <span className="text-2xl font-extralight text-gray-800 tracking-wider">CSUF Birds</span>
             </div>
             
-            <div className="hidden md:flex items-center space-x-6">
-              {['Tours', 'Species', 'AI Insights', 'Contact'].map((item) => (
+            <div className="hidden md:flex items-center space-x-10">
+              {['Tours', 'Species', 'AI Magic', 'Checklist', 'Contact'].map((item, index) => (
                 <button 
                   key={item}
-                  onClick={() => scrollToSection(item.toLowerCase().replace(/\s+/g, '-'))}
-                  className="nav-link relative text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 group py-1"
+                  onClick={() => item === 'Checklist' ? setShowChecklist(true) : scrollToSection(item.toLowerCase().replace(/\s+/g, '-'))}
+                  className="relative text-gray-600 hover:text-gray-900 transition-all duration-500 group py-2 px-1"
+                  style={{animationDelay: `${index * 100}ms`}}
                 >
                   {item}
+                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-500 to-blue-500 group-hover:w-full transition-all duration-500"></div>
+                  <div className="absolute -inset-2 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                 </button>
               ))}
             </div>
 
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-1.5 rounded-md hover:bg-muted focus:outline-none focus:ring-1 focus:ring-primary/50"
+              className="md:hidden p-3 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-500"
             >
-              <div className="space-y-1">
-                <div className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-[2.5px]' : ''}`}></div>
-                <div className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></div>
-                <div className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-[2.5px]' : ''}`}></div>
+              <div className="space-y-2">
+                <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-500 ${isMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-500 ${isMenuOpen ? 'opacity-0 scale-0' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-500 ${isMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></div>
               </div>
             </button>
           </div>
 
           {isMenuOpen && (
-            <div className="md:hidden pt-2.5 pb-1 space-y-0.5 animate-fade-in">
-              {['Tours', 'Species', 'AI Insights', 'Contact'].map((item) => (
+            <div className="md:hidden pt-6 pb-4 space-y-4 animate-fade-in">
+              {['Tours', 'Species', 'AI Magic', 'Checklist', 'Contact'].map((item) => (
                 <button 
                   key={item}
-                  onClick={() => scrollToSection(item.toLowerCase().replace(/\s+/g, '-'))}
-                  className="block w-full text-left text-sm text-muted-foreground hover:text-primary py-1.5 px-2 rounded-md hover:bg-muted transition-colors"
+                  onClick={() => item === 'Checklist' ? setShowChecklist(true) : scrollToSection(item.toLowerCase().replace(/\s+/g, '-'))}
+                  className="block w-full text-left text-gray-600 hover:text-gray-900 py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-500"
                 >
                   {item}
                 </button>
@@ -322,108 +293,119 @@ const Index = () => {
         </div>
       </nav>
       
-      <section id="hero" className="relative min-h-[calc(100vh-70px)] sm:min-h-screen flex items-center justify-center overflow-hidden pt-[70px] hero-bg-static">
-        <div className="absolute inset-0 hero-bg-image-subtle"></div>
-         <div 
-          className="absolute inset-0 bg-gradient-to-br from-background via-background/80 to-background/50 dark:from-background dark:via-background/90 dark:to-background/70"
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Hero content... */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-green-50 via-blue-50 via-purple-50 to-white"
+          style={{transform: `translateY(${scrollY * 0.4}px) scale(${1 + scrollY * 0.0002})`}}
         ></div>
-
-        <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl mx-auto">
-          <div className="space-y-6 sm:space-y-8">
-            <div className="space-y-3 sm:space-y-4">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-tight tracking-tight hero-text-reveal">
-                <span className="hero-text-reveal-item">Explore CSUF's</span>
-                <span className="hero-text-reveal-item block text-primary font-semibold">Avian Wonders</span>
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          <div className="space-y-12 animate-fade-in">
+            <div className="space-y-6">
+              <h1 className="text-7xl md:text-9xl font-extralight text-gray-800 leading-none tracking-tighter">
+                <span className="inline-block animate-fade-in stagger-1">Discover</span>
+                <span className="block text-transparent bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text font-light animate-fade-in stagger-2">Birds</span>
               </h1>
-              <p className="text-md sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed hero-text-reveal-item hero-text-reveal-delay-1">
-                Discover diverse birdlife on campus with guided tours and intelligent AI-powered insights.
+              <p className="text-2xl md:text-3xl text-gray-500 font-extralight max-w-3xl mx-auto leading-relaxed animate-fade-in stagger-3">
+                Guided campus tours & AI-powered bird experiences at Cal State Fullerton
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6 hero-text-reveal-item hero-text-reveal-delay-2">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-12 animate-fade-in stagger-4">
               <Button 
                 onClick={() => scrollToSection('tours')}
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-7 py-3 text-sm rounded-md shadow-sm hover:shadow-md transition-all"
+                className="group bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white px-12 py-6 rounded-full transition-all duration-700 transform hover:scale-110 hover:shadow-2xl shadow-lg"
               >
-                View Tours
-                <ArrowRight className="ml-2 h-4 w-4" />
+                Explore Tours
+                <ArrowRight className="ml-3 h-5 w-5 transition-transform duration-500 group-hover:translate-x-2" />
               </Button>
                <Button 
-                onClick={() => scrollToSection('ai-insights')}
-                size="lg"
+                onClick={() => scrollToSection('ai-magic')}
                 variant="outline"
-                className="border-border hover:bg-accent hover:text-accent-foreground text-foreground px-7 py-3 text-sm rounded-md shadow-sm hover:shadow-md transition-all"
+                className="group border-2 border-gray-300 hover:border-purple-500 px-12 py-6 rounded-full transition-all duration-700 transform hover:scale-110 hover:shadow-xl bg-white/80 backdrop-blur-sm"
               >
-                <Sparkles className="mr-2 h-4 w-4" />
-                AI Insights
+                <Sparkles className="mr-3 h-5 w-5 transition-transform duration-500 group-hover:rotate-12 text-purple-500" />
+                Try AI Magic
               </Button>
             </div>
           </div>
         </div>
-         <div className="absolute bottom-8 sm:bottom-10 left-1/2 transform -translate-x-1/2 animate-float-subtle">
-          <ChevronDown className="h-7 w-7 text-muted-foreground/50" />
+         <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="animate-pulse">
+            <ChevronDown className="h-8 w-8 text-gray-400" />
+          </div>
         </div>
       </section>
 
-      <section id="tours" className="py-20 sm:py-28 px-4 sm:px-6" data-animate>
+      <section id="tours" className="py-40 px-6 relative" data-animate>
+        {/* Tours section ... */}
          <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-3 tracking-tight">Our Guided Tours</h2>
-            <div className="w-24 h-0.5 bg-primary mx-auto rounded-full"></div>
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-8 tracking-tighter">Tours</h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-green-500 to-blue-500 mx-auto rounded-full"></div>
           </div>
-          <div className="flex justify-center mb-10 sm:mb-12">
-            <div className="flex bg-muted/50 p-1 rounded-lg shadow-xs border border-border/50">
+          <div className="flex justify-center mb-20">
+            <div className="flex bg-gradient-to-r from-gray-50 to-gray-100 p-2 rounded-full shadow-lg backdrop-blur-sm">
               {['all', 'morning', 'afternoon', 'evening'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`px-4 py-1.5 rounded-md transition-all duration-200 text-xs sm:text-sm font-medium relative focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-primary/70 ${
+                  className={`px-8 py-3 rounded-full transition-all duration-500 text-sm font-light relative overflow-hidden ${
                     activeFilter === filter 
-                      ? 'bg-background text-primary shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-background/70'
+                      ? 'bg-gradient-to-r from-white to-gray-50 text-gray-900 shadow-lg transform scale-105' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                   }`}
                 >
-                  {filter === 'all' ? 'All Tours' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {activeFilter === filter && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-100/50 to-blue-100/50 rounded-full animate-pulse"></div>
+                  )}
                 </button>
               ))}
             </div>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid md:grid-cols-3 gap-10">
             {filterTours(activeFilter).map((tour, index) => (
               <div 
                 key={tour.id} 
                 className="group cursor-pointer"
-                onClick={() => setSelectedTourDetails(tour)}
-                style={{animationDelay: `${index * 100}ms`}}
+                onClick={() => setSelectedTour(tour)}
+                style={{animationDelay: `${index * 200}ms`}}
               >
-                <Card className="overflow-hidden border-border/80 shadow-md hover:shadow-lg transition-all duration-300 bg-card rounded-lg hover:-translate-y-1">
-                  <div className="relative h-52 sm:h-56 overflow-hidden">
+                <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-1000 transform hover:-translate-y-8 hover:rotate-1 bg-white/90 backdrop-blur-sm">
+                  <div className="relative h-72 overflow-hidden">
                     <img 
                       src={tour.image} 
                       alt={tour.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-125"
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${tour.color} opacity-[0.07] group-hover:opacity-[0.12] transition-opacity duration-400`}></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/15 dark:from-black/25 to-transparent"></div>
-                    <div className="absolute top-2.5 right-2.5">
-                      <Badge variant="secondary" className="bg-background/80 text-foreground font-medium border-border/50 px-2 py-0.5 rounded text-[10px] shadow-xs">
+                    <div className={`absolute inset-0 bg-gradient-to-t ${tour.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700`}></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    <div className="absolute top-6 right-6">
+                      <Badge className="bg-white/90 backdrop-blur-sm text-gray-700 font-light border-0 px-4 py-2 rounded-full">
                         {tour.difficulty}
                       </Badge>
                     </div>
                   </div>
-                  <CardContent className="p-4 sm:p-5 space-y-2.5">
+                  <CardContent className="p-10 space-y-6">
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-0.5 group-hover:text-primary transition-colors">{tour.title}</h3>
-                      <p className="text-muted-foreground text-xs sm:text-sm font-light">{tour.subtitle}</p>
+                      <h3 className="text-3xl font-light text-gray-800 mb-2">{tour.title}</h3>
+                      <p className="text-gray-500 font-light text-lg">{tour.subtitle}</p>
                     </div>
-                    <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground pt-1.5 border-t border-border/60">
-                      <div className="flex items-center gap-1"> <Clock className="h-3 w-3" /> {tour.duration} </div>
-                      <div className="flex items-center gap-1"> <Camera className="h-3 w-3" /> {tour.species.length} species </div>
+                    <div className="flex items-center justify-between text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        {tour.duration}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Camera className="h-4 w-4" />
+                        {tour.species.length} species
+                      </div>
                     </div>
-                     <div className="pt-1.5">
-                      <Button variant="link" className="p-0 h-auto text-xs text-primary group-hover:underline font-medium">
-                        View Details <ArrowRight className="ml-1 h-3 w-3" />
-                      </Button>
+                    <div className="pt-6">
+                      <div className="flex items-center justify-between group-hover:translate-x-4 transition-transform duration-500">
+                        <span className="text-gray-600 font-light text-lg">View Details</span>
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-500" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -433,30 +415,31 @@ const Index = () => {
         </div>
       </section>
 
-      <section id="species" className="py-20 sm:py-28 px-4 sm:px-6 bg-muted/30 dark:bg-background" data-animate>
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-3 tracking-tight">Meet the Species</h2>
-             <div className="w-28 h-0.5 bg-primary mx-auto rounded-full"></div>
+      <section id="species" className="py-40 px-6 bg-gradient-to-br from-gray-50 via-green-50/30 to-blue-50/30 relative" data-animate>
+        {/* Species section ... */}
+         <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-8 tracking-tighter">Species</h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-green-500 to-blue-500 mx-auto rounded-full"></div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-5">
-            {allCampusBirds.map((bird, index) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+            {birdSpecies.map((bird, index) => (
               <div 
                 key={index} 
-                className="group aspect-[5/6] relative overflow-hidden rounded-lg bg-card shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-border/70"
-                style={{animationDelay: `${index * 70}ms`}}
+                className="group aspect-square relative overflow-hidden rounded-3xl bg-white shadow-lg hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-4 hover:rotate-2"
+                style={{animationDelay: `${index * 150}ms`}}
               >
                 <img 
                   src={bird.image} 
                   alt={bird.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent opacity-95 group-hover:opacity-100 transition-opacity duration-400"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-3 transform translate-y-2 group-hover:translate-y-0 transition-all duration-400 opacity-0 group-hover:opacity-100">
-                  <h3 className="text-white font-semibold text-xs sm:text-sm mb-0.5 truncate">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute bottom-6 left-6 right-6 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+                  <h3 className="text-white font-light text-lg mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     {bird.name}
                   </h3>
-                  <p className="text-white/80 text-[10px] sm:text-xs line-clamp-2 leading-tight">
+                  <p className="text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                     {bird.description}
                   </p>
                 </div>
@@ -466,150 +449,322 @@ const Index = () => {
         </div>
       </section>
 
-      <section id="ai-insights" className="py-20 sm:py-28 px-4 sm:px-6 bg-background dark:bg-slate-900/50" data-animate>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground dark:text-gray-100 mb-2 tracking-tight">
-              AI Bird <span className="text-primary">Insights</span>
+      {/* AI Magic Section */}
+      <section id="ai-magic" className="py-40 px-6 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 relative" data-animate>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-4 tracking-tighter">
+              AI Bird <span className="text-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 bg-clip-text">Magic</span>
             </h2>
-            <p className="text-sm sm:text-md text-muted-foreground font-light max-w-md mx-auto">
-              Explore birding with intelligent assistance.
+            <p className="text-xl text-gray-500 font-light max-w-2xl mx-auto">
+              Interact with our feathered friends like never before through the power of AI!
             </p>
-            <div className="w-28 h-0.5 bg-primary mx-auto rounded-full mt-3"></div>
+            <div className="w-48 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full mt-6"></div>
              {aiError && (
-                <div className="mt-5 p-3 bg-destructive/10 border border-destructive/30 text-destructive rounded-md shadow-xs text-xs">
-                    <p className="font-medium">AI Feature Error:</p>
-                    <p>{aiError} Please check API key/network.</p>
+                <div className="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                    <p className="font-semibold">AI Error:</p>
+                    <p>{aiError} Please check your API key or network and try again.</p>
                 </div>
             )}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-            {[
-              { icon: MessageSquare, title: "Chat with a Bird", desc: "Ask a virtual bird anything!", feature: "chat" },
-              { icon: Brain, title: "Tour Guide AI", desc: "Find your perfect tour.", feature: "recommend" },
-              { icon: Info, title: "Bird Fact Finder", desc: "Get a surprising fact.", feature: "fact" },
-              { icon: ShieldQuestion, title: "Birding Ethics AI", desc: "Ask about responsible birding.", feature: "ethics" }
-            ].map(item => (
-            <Card key={item.feature} className="ai-feature-card overflow-hidden border-border/80 shadow-md bg-card backdrop-blur-md p-4 sm:p-5 group hover:shadow-lg transition-shadow duration-300 rounded-lg">
-              <CardHeader className="p-0 mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className={`p-2 bg-gradient-to-br ${
-                    item.feature === 'chat' ? 'from-sky-400 to-blue-500' :
-                    item.feature === 'recommend' ? 'from-orange-400 to-amber-500' :
-                    item.feature === 'fact' ? 'from-lime-400 to-green-500' :
-                    'from-indigo-400 to-purple-500'
-                  } rounded-md shadow-sm`}>
-                     <item.icon className="h-5 w-5 text-white" />
+          <div className="space-y-16">
+            {/* AI Feature 1: Bird Persona Chat */}
+            <Card className="overflow-hidden border-0 shadow-xl bg-white/95 backdrop-blur-md p-6 md:p-8 group hover:shadow-2xl transition-shadow duration-500">
+              <CardHeader className="p-0 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-tr from-sky-400 to-blue-500 rounded-xl shadow-lg">
+                     <MessageSquare className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-md font-semibold text-foreground">{item.title}</CardTitle>
-                    <CardDescription className="text-muted-foreground font-light text-xs">{item.desc}</CardDescription>
+                    <CardTitle className="text-2xl md:text-3xl font-light text-gray-800">Chat with a Bird!</CardTitle>
+                    <CardDescription className="text-gray-500 font-light">Select a bird and ask it anything.</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                {item.feature === 'chat' && (
+                <div className="mb-4">
+                  <Select onValueChange={(value) => { setSelectedBirdForChat(value); setChatMessages([]); }} value={selectedBirdForChat || ""}>
+                    <SelectTrigger className="w-full md:w-1/2">
+                      <SelectValue placeholder="Select a bird to chat with..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {birdSpecies.map(bird => (
+                        <SelectItem key={bird.name} value={bird.name}>{bird.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedBirdForChat && (
                   <>
-                    <div className="mb-2.5">
-                      <Select onValueChange={(value) => { setSelectedBirdForChat(value); setChatMessages([]); }} value={selectedBirdForChat || ""}>
-                        <SelectTrigger className="w-full text-xs bg-background border-border/80 hover:border-primary/50 focus:ring-primary/50">
-                          <SelectValue placeholder="Select a bird..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {allCampusBirds.map(bird => ( <SelectItem key={bird.name} value={bird.name}>{bird.name}</SelectItem> ))}
-                        </SelectContent>
-                      </Select>
+                    <ScrollArea className="h-64 w-full rounded-md border p-4 mb-4 bg-gray-50" ref={chatContainerRef}>
+                      {chatMessages.length === 0 && (
+                        <p className="text-center text-gray-500">Say hi to the {selectedBirdForChat}!</p>
+                      )}
+                      {chatMessages.map((msg, index) => (
+                        <div key={index} className={`flex mb-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[70%] p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-bl-none'}`}>
+                           {msg.sender === 'ai' && <BotMessageSquare className="inline-block h-4 w-4 mr-1 mb-0.5" />} {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                       {isAiRespondingChat && (
+                        <div className="flex justify-start mb-3">
+                           <div className="max-w-[70%] p-3 rounded-2xl bg-gray-200 text-gray-800 rounded-bl-none flex items-center">
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" /> Typing...
+                          </div>
+                        </div>
+                      )}
+                    </ScrollArea>
+                    <div className="flex gap-2">
+                      <Textarea 
+                        placeholder={`Message the ${selectedBirdForChat}...`} 
+                        value={currentUserMessage}
+                        onChange={(e) => setCurrentUserMessage(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
+                        className="flex-1 resize-none"
+                        rows={1}
+                      />
+                      <Button onClick={handleSendMessage} disabled={isAiRespondingChat || !currentUserMessage.trim()} className="bg-blue-500 hover:bg-blue-600 h-auto px-4">
+                        <Send className="h-5 w-5" />
+                      </Button>
                     </div>
-                    {selectedBirdForChat && ( <> {/* Chat UI */} </> )}
                   </>
                 )}
-                 {/* Simplified UI for other AI features for brevity, showing only main interaction */}
-                {item.feature === 'recommend' && (
-                  <div className="flex flex-col gap-2">
-                    <Input type="text" placeholder="e.g., 'Easy morning walk'" value={tourPreferences} onChange={(e) => setTourPreferences(e.target.value)} className="flex-1 text-xs bg-background border-border/80 focus:border-primary/70 focus:ring-primary/70"/>
-                    <Button onClick={handleRecommendTour} disabled={isAiRecommendingTour || !tourPreferences.trim()} size="sm" className="w-full text-xs bg-primary hover:bg-primary/90">
-                      {isAiRecommendingTour ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Sparkles className="mr-1.5 h-3.5 w-3.5" />} Find My Tour
-                    </Button>
-                    {isAiRecommendingTour && ( <div className="text-center p-2 text-xs text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" /><p className="mt-1">Consulting...</p></div> )}
-                    {recommendedTour && !isAiRecommendingTour && ( <div className="mt-2 p-2 bg-accent/50 border border-border/50 rounded-md text-xs text-foreground shadow-xs"> <p>{recommendedTour}</p> </div> )}
+              </CardContent>
+            </Card>
+
+            {/* AI Feature 2: Bird Poem Generator */}
+            <Card className="overflow-hidden border-0 shadow-xl bg-white/95 backdrop-blur-md p-6 md:p-8 group hover:shadow-2xl transition-shadow duration-500">
+               <CardHeader className="p-0 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-tr from-pink-400 to-rose-500 rounded-xl shadow-lg">
+                     <Feather className="h-8 w-8 text-white" />
                   </div>
-                )}
-                {item.feature === 'fact' && (
-                  <div className="flex flex-col sm:flex-row gap-2">
-                     <Select onValueChange={setSelectedBirdForFact} value={selectedBirdForFact || ""}>
-                        <SelectTrigger className="w-full sm:flex-1 text-xs bg-background border-border/80 hover:border-primary/50 focus:ring-primary/50">
-                          <SelectValue placeholder="Select bird..." />
-                        </SelectTrigger>
-                        <SelectContent> {allCampusBirds.map(bird => ( <SelectItem key={bird.name} value={bird.name}>{bird.name}</SelectItem> ))} </SelectContent>
-                      </Select>
-                    <Button onClick={handleFetchBirdFact} disabled={isAiFetchingFact || !selectedBirdForFact} size="sm" className="w-full sm:w-auto text-xs bg-primary hover:bg-primary/90">
-                      {isAiFetchingFact ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> :  <Sparkles className="mr-1.5 h-3.5 w-3.5" />} Get Fact
-                    </Button>
-                     {isAiFetchingFact && ( <div className="w-full text-center p-2 text-xs text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" /><p className="mt-1">Searching...</p></div> )}
-                    {birdFact && !isAiFetchingFact && ( <div className="w-full mt-2 p-2 bg-accent/50 border border-border/50 rounded-md text-xs text-foreground shadow-xs sm:col-span-2"> <p>{birdFact}</p> </div> )}
+                  <div>
+                    <CardTitle className="text-2xl md:text-3xl font-light text-gray-800">AI Bird Poems</CardTitle>
+                    <CardDescription className="text-gray-500 font-light">Let AI craft a unique poem for your chosen bird.</CardDescription>
                   </div>
-                )}
-                {item.feature === 'ethics' && (
-                  <div className="flex flex-col gap-2">
-                    <Input type="text" placeholder="e.g., 'Feeding wild birds?'" value={ethicsQuery} onChange={(e) => setEthicsQuery(e.target.value)} className="flex-1 text-xs bg-background border-border/80 focus:border-primary/70 focus:ring-primary/70"/>
-                    <Button onClick={handleGetEthicsAdvice} disabled={isAiAdvisingEthics || !ethicsQuery.trim()} size="sm" className="w-full text-xs bg-primary hover:bg-primary/90">
-                       {isAiAdvisingEthics ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Sparkles className="mr-1.5 h-3.5 w-3.5" />} Get Advice
-                    </Button>
-                    {isAiAdvisingEthics && ( <div className="text-center p-2 text-xs text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" /><p className="mt-1">Consulting...</p></div> )}
-                    {ethicsAdvice && !isAiAdvisingEthics && ( <div className="mt-2 p-2 bg-accent/50 border border-border/50 rounded-md text-xs text-foreground shadow-xs"> <p>{ethicsAdvice}</p> </div> )}
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <Select onValueChange={setSelectedBirdForPoem} value={selectedBirdForPoem || ""}>
+                    <SelectTrigger className="w-full sm:flex-1">
+                      <SelectValue placeholder="Select a bird for a poem..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {birdSpecies.map(bird => (
+                        <SelectItem key={bird.name} value={bird.name}>{bird.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={handleGeneratePoem} disabled={isAiGeneratingPoem || !selectedBirdForPoem} className="w-full sm:w-auto bg-pink-500 hover:bg-pink-600">
+                    {isAiGeneratingPoem ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> :  <Sparkles className="mr-2 h-5 w-5" />}
+                    Generate Poem
+                  </Button>
+                </div>
+                 {isAiGeneratingPoem && (
+                   <div className="text-center p-6">
+                     <Loader2 className="h-12 w-12 animate-spin text-pink-500 mx-auto" />
+                     <p className="text-gray-500 mt-2">Crafting your poem...</p>
+                   </div>
+                 )}
+                {generatedPoem && !isAiGeneratingPoem && (
+                  <div className="mt-4 p-6 bg-rose-50 border border-rose-200 rounded-lg whitespace-pre-line font-serif text-gray-700">
+                    {generatedPoem}
                   </div>
                 )}
               </CardContent>
             </Card>
-            ))}
           </div>
         </div>
       </section>
 
-      <section id="contact" className="py-20 sm:py-28 px-4 sm:px-6 bg-muted/20 dark:bg-background" data-animate>
-         <div className="max-w-md mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-3 tracking-tight">Ready to Explore?</h2>
-          <div className="w-20 h-0.5 bg-primary mx-auto mb-8"></div>
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Join us to witness the vibrant avian life on campus. Select a tour and start your adventure!
+
+      <section id="contact" className="py-40 px-6" data-animate>
+        {/* Contact section ... */}
+         <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-4xl md:text-6xl font-extralight text-gray-800 mb-6 tracking-tight">Contact</h2>
+          <div className="w-24 h-px bg-green-500 mx-auto mb-16"></div>
+          <div className="space-y-8">
+            <p className="text-xl text-gray-500 font-light leading-relaxed">
+              Ready to explore campus wildlife?
             </p>
-            <Button 
-              onClick={() => scrollToSection('tours')}
-               size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 text-sm rounded-md shadow-sm hover:shadow-md transition-all"
-            >
-              Explore Tours
-              <ArrowRight className="ml-1.5 h-4 w-4" />
+            <Button className="bg-gray-900 hover:bg-gray-800 text-white px-12 py-4 rounded-full transition-all duration-500 transform hover:scale-105">
+              Book a Tour
             </Button>
-            <div className="pt-4 space-y-0.5 text-muted-foreground text-xs">
-              <p>Email: birdtours@fullerton.edu</p>
-              <p>Phone: (657) 278-2011</p>
+            <div className="pt-8 space-y-2 text-gray-400 font-light">
+              <p>birdtours@fullerton.edu</p>
+              <p>(657) 278-2011</p>
             </div>
           </div>
         </div>
       </section>
 
-      <footer className="py-10 sm:py-12 px-4 sm:px-6 border-t border-border/70 bg-background">
+      <footer className="py-20 px-6 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        {/* Footer ... */}
          <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4 group">
-            <Bird className="h-5 w-5 text-muted-foreground/80 transition-all duration-500 group-hover:text-primary" />
-            <span className="text-muted-foreground text-xs font-medium">CSUF Titan Bird Trails</span>
+          <div className="flex items-center justify-center space-x-4 mb-8 group">
+            <Bird className="h-8 w-8 text-gray-400 transition-all duration-700 group-hover:scale-110 group-hover:text-green-500" />
+            <span className="text-gray-400 font-light text-lg">CSUF Bird Tours</span>
           </div>
-          <p className="text-muted-foreground/70 text-[10px] font-light">
-            © {new Date().getFullYear()} California State University, Fullerton. All Rights Reserved.
-            <br />
-            Dedicated to exploring and appreciating campus biodiversity.
+          <p className="text-gray-400 text-sm font-light">
+            © 2024 California State University, Fullerton
           </p>
         </div>
       </footer>
       
-      {/* Modals - Ensure styling here is also minimal and clean */}
-      {selectedTourDetails && ( /* Tour Details Modal */ <></> )}
-      {showActiveTourModal && currentGuidedTour && ( /* Active Tour (Checklist/Guide) Modal */ <></> )}
-      {/* ... Modal JSX is the same as previous version, but will inherit new base styles ... */}
+      {/* Tour Modal */}
+      {selectedTour && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto animate-scale-in">
+            <div className="relative h-64 overflow-hidden rounded-t-3xl">
+              <img 
+                src={selectedTour.image} 
+                alt={selectedTour.title}
+                className="w-full h-full object-cover"
+              />
+              <div className={`absolute inset-0 bg-gradient-to-t ${selectedTour.color} opacity-20`}></div>
+              <button 
+                onClick={() => setSelectedTour(null)}
+                className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full p-3 hover:bg-white transition-colors duration-300"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-8">
+              <div>
+                <h3 className="text-3xl font-light text-gray-800 mb-2">{selectedTour.title}</h3>
+                <p className="text-gray-500 font-light text-lg">{selectedTour.subtitle}</p>
+              </div>
 
+              <p className="text-gray-600 font-light leading-relaxed">{selectedTour.description}</p>
+              
+              <div className="grid grid-cols-2 gap-6 border-t border-b border-gray-100 py-6">
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Details</h4>
+                  <ul className="space-y-1 text-gray-500 font-light">
+                    <li><span className="font-normal text-gray-700">Time:</span> {selectedTour.time}</li>
+                    <li><span className="font-normal text-gray-700">Duration:</span> {selectedTour.duration}</li>
+                    <li><span className="font-normal text-gray-700">Difficulty:</span> {selectedTour.difficulty}</li>
+                    <li><span className="font-normal text-gray-700">Guide:</span> {selectedTour.details.guide}</li>
+                    <li><span className="font-normal text-gray-700">Meeting Point:</span> {selectedTour.details.meetingPoint}</li>
+                  </ul>
+                </div>
+                 <div>
+                  <h4 className="font-medium text-gray-800 mb-2">Focus</h4>
+                  <p className="text-gray-500 font-light">{selectedTour.details.focus}</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-800 mb-3">Species You Might See</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTour.species.map((species) => (
+                    <Badge key={species} className="bg-gray-100 text-gray-700 font-light border-0 px-3 py-1">
+                      {species}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+               <div>
+                <h4 className="font-medium text-gray-800 mb-3">What to Bring</h4>
+                <ul className="list-disc list-inside space-y-1 text-gray-500 font-light">
+                  {selectedTour.details.whatToBring.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="flex gap-4 pt-4">
+                <Button 
+                  onClick={() => { setSelectedTour(null); scrollToSection('contact'); }}
+                  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-full py-3 transition-all duration-300"
+                >
+                  Book This Tour
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setSelectedTour(null)}
+                  className="px-8 rounded-full border-gray-200 hover:bg-gray-50 transition-all duration-300"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Checklist Modal */}
+      {showChecklist && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-lg z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in shadow-2xl">
+            <div className="p-8 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-3xl font-light text-gray-800">My Birding Checklist</h3>
+                  <p className="text-gray-500 font-light mt-2">Track your campus bird sightings</p>
+                </div>
+                <button 
+                  onClick={() => setShowChecklist(false)}
+                  className="bg-gray-100 hover:bg-gray-200 rounded-full p-3 transition-all duration-300 transform hover:scale-110"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-8">
+              <div className="space-y-4">
+                {birdSpecies.map((bird, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center space-x-4 p-4 rounded-xl hover:bg-gray-50 transition-all duration-300 group"
+                  >
+                    <button
+                      onClick={() => toggleBirdCheck(bird.name)}
+                      className="text-green-600 hover:scale-110 transition-transform duration-200"
+                    >
+                      {checkedBirds.has(bird.name) ? 
+                        <CheckCircle className="h-6 w-6" /> : 
+                        <Circle className="h-6 w-6" />
+                      }
+                    </button>
+                    <img 
+                      src={bird.image} 
+                      alt={bird.name}
+                      className="w-12 h-12 rounded-lg object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="flex-1">
+                      <h4 className={`font-medium ${checkedBirds.has(bird.name) ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                        {bird.name}
+                      </h4>
+                      <p className="text-sm text-gray-500">{bird.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  <Star className="h-6 w-6 text-yellow-500" />
+                  <div>
+                    <h4 className="font-medium text-gray-800">Progress</h4>
+                    <p className="text-sm text-gray-600">
+                      {checkedBirds.size} of {birdSpecies.length} birds spotted
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
