@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, MapPin, Clock, Bird, Camera, Filter, X, ArrowRight, CheckCircle, Circle, Star, Trophy, BookOpen, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -148,121 +147,86 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white overflow-hidden relative">
-      {/* Ultra-Enhanced Floating Background Elements with Advanced Tracking */}
+      {/* Enhanced Floating Background Elements with Mouse Tracking */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {/* Floating animated birds */}
         <div 
-          className="absolute w-8 h-8 opacity-30 transition-all duration-2000"
+          className="absolute w-3 h-3 bg-gradient-to-r from-green-300 to-emerald-400 rounded-full animate-float opacity-70 transition-all duration-1000"
           style={{
-            top: `${15 + mousePosition.y * 0.03}%`,
-            left: `${8 + mousePosition.x * 0.02}%`,
-            transform: `translate(${mousePosition.x * 0.04}px, ${mousePosition.y * 0.03}px) rotate(${mousePosition.x * 0.05}deg)`,
-            animation: 'float 12s ease-in-out infinite'
-          }}
-        >
-          <Bird className="w-full h-full text-emerald-400 animate-pulse" />
-        </div>
-        
-        <div 
-          className="absolute w-6 h-6 opacity-40 transition-all duration-1500"
-          style={{
-            top: `${60 + mousePosition.y * -0.02}%`,
-            right: `${15 + mousePosition.x * 0.025}%`,
-            transform: `translate(${mousePosition.x * -0.03}px, ${mousePosition.y * 0.02}px) rotate(${mousePosition.x * -0.03}deg)`,
-            animation: 'float 10s ease-in-out infinite',
-            animationDelay: '3s'
-          }}
-        >
-          <Bird className="w-full h-full text-blue-400 animate-pulse" />
-        </div>
-
-        <div 
-          className="absolute w-5 h-5 opacity-50 transition-all duration-1800"
-          style={{
-            bottom: `${25 + mousePosition.y * 0.025}%`,
-            left: `${30 + mousePosition.x * -0.03}%`,
-            transform: `translate(${mousePosition.x * 0.025}px, ${mousePosition.y * -0.02}px) rotate(${mousePosition.x * 0.04}deg)`,
-            animation: 'float 14s ease-in-out infinite',
-            animationDelay: '6s'
-          }}
-        >
-          <Bird className="w-full h-full text-amber-400 animate-pulse" />
-        </div>
-
-        {/* Enhanced gradient orbs with pulsing */}
-        <div 
-          className="absolute top-1/4 right-1/4 w-40 h-40 bg-gradient-to-r from-emerald-200/30 to-cyan-300/30 rounded-full blur-3xl animate-pulse transition-all duration-3000"
-          style={{
-            transform: `scale(${1 + Math.sin(Date.now() * 0.001) * 0.1}) rotate(${scrollY * 0.05}deg)`
+            top: `${20 + mousePosition.y * 0.02}%`,
+            left: `${10 + mousePosition.x * 0.01}%`,
+            transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`
           }}
         ></div>
         <div 
-          className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-gradient-to-r from-purple-200/25 to-pink-300/25 rounded-full blur-3xl animate-pulse transition-all duration-4000"
+          className="absolute w-4 h-4 bg-gradient-to-r from-blue-300 to-cyan-400 rounded-full animate-float opacity-50"
+          style={{
+            animationDelay: '1s',
+            top: `${40 + mousePosition.y * -0.01}%`,
+            right: `${20 + mousePosition.x * 0.015}%`,
+            transform: `translate(${mousePosition.x * -0.01}px, ${mousePosition.y * 0.01}px)`
+          }}
+        ></div>
+        <div 
+          className="absolute w-2 h-2 bg-gradient-to-r from-amber-300 to-yellow-400 rounded-full animate-float opacity-60"
           style={{
             animationDelay: '2s',
-            transform: `scale(${1 + Math.cos(Date.now() * 0.0008) * 0.15}) rotate(${scrollY * -0.03}deg)`
+            bottom: `${40 + mousePosition.y * 0.01}%`,
+            left: `${25 + mousePosition.x * -0.02}%`,
+            transform: `translate(${mousePosition.x * 0.015}px, ${mousePosition.y * -0.015}px)`
           }}
         ></div>
         
-        {/* Morphing geometric shapes */}
-        <div 
-          className="absolute top-1/3 left-1/5 w-20 h-20 bg-gradient-to-br from-green-300/20 to-transparent rounded-full transition-all duration-5000"
-          style={{
-            transform: `translateY(${scrollY * -0.1}px) scale(${1 + Math.sin(scrollY * 0.01) * 0.3})`,
-            borderRadius: `${50 + Math.sin(Date.now() * 0.002) * 20}%`
-          }}
-        ></div>
+        {/* Animated gradient orbs */}
+        <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-green-200/20 to-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-40 h-40 bg-gradient-to-r from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
 
-      {/* Ultra-Enhanced Navigation with Advanced Glass Effect */}
-      <nav className="fixed top-0 w-full bg-white/60 backdrop-blur-3xl z-50 border-b border-white/30 shadow-2xl shadow-black/10">
-        <div className="max-w-7xl mx-auto px-6 py-5">
+      {/* Enhanced Navigation with Glass Effect */}
+      <nav className="fixed top-0 w-full bg-white/70 backdrop-blur-2xl z-50 border-b border-white/20 shadow-lg shadow-black/5">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-5 group">
+            <div className="flex items-center space-x-4 group">
               <div className="relative">
-                <Bird className="h-9 w-9 text-gray-800 transition-all duration-1000 group-hover:scale-150 group-hover:rotate-45" />
-                <div className="absolute -inset-4 bg-gradient-to-r from-emerald-100/50 to-cyan-100/50 rounded-full opacity-0 group-hover:opacity-60 transition-all duration-700 blur-lg animate-pulse"></div>
-                <div className="absolute -inset-2 bg-gradient-to-r from-emerald-200/30 to-cyan-200/30 rounded-full opacity-0 group-hover:opacity-40 transition-all duration-500 blur-sm"></div>
+                <Bird className="h-8 w-8 text-gray-800 transition-all duration-700 group-hover:scale-125 group-hover:rotate-12" />
+                <div className="absolute -inset-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-full opacity-0 group-hover:opacity-40 transition-all duration-500 blur-sm"></div>
               </div>
-              <span className="text-2xl font-extralight text-gray-800 tracking-[0.2em] group-hover:tracking-[0.3em] transition-all duration-700">CSUF Birds</span>
+              <span className="text-2xl font-extralight text-gray-800 tracking-wider">CSUF Birds</span>
             </div>
             
-            <div className="hidden md:flex items-center space-x-12">
+            <div className="hidden md:flex items-center space-x-10">
               {['Tours', 'Species', 'Quiz', 'Checklist', 'Contact'].map((item, index) => (
                 <button 
                   key={item}
                   onClick={() => item === 'Quiz' ? setShowQuiz(true) : item === 'Checklist' ? setShowChecklist(true) : scrollToSection(item.toLowerCase())}
-                  className="relative text-gray-600 hover:text-gray-900 transition-all duration-700 group py-3 px-2"
-                  style={{animationDelay: `${index * 150}ms`}}
+                  className="relative text-gray-600 hover:text-gray-900 transition-all duration-500 group py-2 px-1"
+                  style={{animationDelay: `${index * 100}ms`}}
                 >
-                  <span className="relative z-10">{item}</span>
-                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 group-hover:w-full transition-all duration-700"></div>
-                  <div className="absolute -inset-3 bg-gradient-to-r from-emerald-50/50 to-cyan-50/50 rounded-xl opacity-0 group-hover:opacity-50 transition-all duration-500 blur-sm"></div>
-                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-100/20 to-cyan-100/20 rounded-lg opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
+                  {item}
+                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-500 to-blue-500 group-hover:w-full transition-all duration-500"></div>
+                  <div className="absolute -inset-2 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg opacity-0 group-hover:opacity-30 transition-all duration-300"></div>
                 </button>
               ))}
             </div>
 
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50/80 hover:to-gray-100/80 transition-all duration-700 backdrop-blur-sm"
+              className="md:hidden p-3 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-500"
             >
               <div className="space-y-2">
-                <div className={`w-7 h-0.5 bg-gray-600 transition-all duration-700 ${isMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></div>
-                <div className={`w-7 h-0.5 bg-gray-600 transition-all duration-700 ${isMenuOpen ? 'opacity-0 scale-0' : ''}`}></div>
-                <div className={`w-7 h-0.5 bg-gray-600 transition-all duration-700 ${isMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-500 ${isMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-500 ${isMenuOpen ? 'opacity-0 scale-0' : ''}`}></div>
+                <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-500 ${isMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`}></div>
               </div>
             </button>
           </div>
 
           {isMenuOpen && (
-            <div className="md:hidden pt-8 pb-6 space-y-6 animate-fade-in">
-              {['Tours', 'Species', 'Quiz', 'Checklist', 'Contact'].map((item, index) => (
+            <div className="md:hidden pt-6 pb-4 space-y-4 animate-fade-in">
+              {['Tours', 'Species', 'Quiz', 'Checklist', 'Contact'].map((item) => (
                 <button 
                   key={item}
                   onClick={() => item === 'Quiz' ? setShowQuiz(true) : item === 'Checklist' ? setShowChecklist(true) : scrollToSection(item.toLowerCase())}
-                  className="block w-full text-left text-gray-600 hover:text-gray-900 py-4 px-6 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50/80 hover:to-gray-100/80 transition-all duration-700 backdrop-blur-sm"
-                  style={{animationDelay: `${index * 100}ms`}}
+                  className="block w-full text-left text-gray-600 hover:text-gray-900 py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all duration-500"
                 >
                   {item}
                 </button>
@@ -272,171 +236,139 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Revolutionary Hero Section with Bird Background */}
+      {/* Enhanced Hero Section with Parallax */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Aesthetic Bird Background Image */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1472396961693-142e6e269027?w=1920')`,
-            transform: `translateY(${scrollY * 0.3}px) scale(${1 + scrollY * 0.0001})`,
-            filter: 'blur(1px) brightness(1.2) contrast(1.1)'
-          }}
-        ></div>
-        
-        {/* Enhanced Gradient Overlay */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-cyan-50/80 via-blue-50/85 to-white/95"
+          className="absolute inset-0 bg-gradient-to-br from-green-50 via-blue-50 via-purple-50 to-white"
           style={{transform: `translateY(${scrollY * 0.4}px) scale(${1 + scrollY * 0.0002})`}}
         ></div>
         
-        {/* Ultra-Advanced Animated Background Shapes */}
+        {/* Animated background shapes */}
         <div 
-          className="absolute top-16 left-16 w-80 h-80 bg-gradient-to-r from-emerald-200/40 to-cyan-300/40 rounded-full blur-3xl animate-pulse"
-          style={{
-            transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg) scale(${1 + Math.sin(Date.now() * 0.001) * 0.2})`,
-            animation: 'float 15s ease-in-out infinite'
-          }}
+          className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-green-200/30 to-emerald-300/30 rounded-full blur-3xl animate-pulse"
+          style={{transform: `translateY(${scrollY * -0.2}px) rotate(${scrollY * 0.1}deg)`}}
         ></div>
         <div 
-          className="absolute bottom-16 right-16 w-96 h-96 bg-gradient-to-r from-blue-200/35 to-purple-300/35 rounded-full blur-3xl animate-pulse"
-          style={{
-            animationDelay: '3s',
-            transform: `translateY(${scrollY * -0.3}px) rotate(${scrollY * -0.1}deg) scale(${1 + Math.cos(Date.now() * 0.0008) * 0.25})`,
-            animation: 'float 18s ease-in-out infinite'
-          }}
+          className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-blue-200/30 to-cyan-300/30 rounded-full blur-3xl animate-pulse"
+          style={{animationDelay: '2s', transform: `translateY(${scrollY * -0.3}px) rotate(${scrollY * -0.1}deg)`}}
         ></div>
         
-        {/* Additional Morphing Elements */}
-        <div 
-          className="absolute top-1/2 left-8 w-32 h-32 bg-gradient-to-br from-amber-200/30 to-orange-300/30 blur-2xl transition-all duration-3000"
-          style={{
-            transform: `translateY(${scrollY * -0.15}px) rotate(${Date.now() * 0.0001}deg)`,
-            borderRadius: `${40 + Math.sin(Date.now() * 0.003) * 30}%`,
-            animation: 'float 20s ease-in-out infinite'
-          }}
-        ></div>
-        
-        <div className="relative z-10 text-center px-6 max-w-6xl mx-auto">
-          <div className="space-y-16 animate-fade-in">
-            <div className="space-y-8">
-              <h1 className="text-8xl md:text-[12rem] font-extralight text-gray-800 leading-none tracking-[-0.02em]">
-                <span className="inline-block animate-fade-in stagger-1 hover:scale-110 transition-transform duration-1000">Discover</span>
-                <span className="block text-transparent bg-gradient-to-r from-emerald-600 via-cyan-600 via-blue-600 to-purple-600 bg-clip-text font-light animate-fade-in stagger-2 hover:scale-105 transition-transform duration-1000 bg-[length:200%_200%] animate-gradient">Birds</span>
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          <div className="space-y-12 animate-fade-in">
+            <div className="space-y-6">
+              <h1 className="text-7xl md:text-9xl font-extralight text-gray-800 leading-none tracking-tighter">
+                <span className="inline-block animate-fade-in stagger-1">Discover</span>
+                <span className="block text-transparent bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text font-light animate-fade-in stagger-2">Birds</span>
               </h1>
-              <p className="text-3xl md:text-4xl text-gray-500 font-extralight max-w-4xl mx-auto leading-relaxed animate-fade-in stagger-3 hover:text-gray-600 transition-colors duration-700">
+              <p className="text-2xl md:text-3xl text-gray-500 font-extralight max-w-3xl mx-auto leading-relaxed animate-fade-in stagger-3">
                 Guided campus tours through Cal State Fullerton's natural habitats
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-8 justify-center pt-16 animate-fade-in stagger-4">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-12 animate-fade-in stagger-4">
               <Button 
                 onClick={() => scrollToSection('tours')}
-                className="group bg-gradient-to-r from-gray-900 to-gray-800 hover:from-emerald-800 hover:to-cyan-800 text-white px-16 py-8 rounded-full transition-all duration-1000 transform hover:scale-125 hover:shadow-3xl shadow-2xl hover:rotate-1"
+                className="group bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white px-12 py-6 rounded-full transition-all duration-700 transform hover:scale-110 hover:shadow-2xl shadow-lg"
               >
-                <span className="relative z-10">Explore Tours</span>
-                <ArrowRight className="ml-4 h-6 w-6 transition-transform duration-700 group-hover:translate-x-3 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-700"></div>
+                Explore Tours
+                <ArrowRight className="ml-3 h-5 w-5 transition-transform duration-500 group-hover:translate-x-2" />
               </Button>
               
               <Button 
                 onClick={() => setShowQuiz(true)}
                 variant="outline"
-                className="group border-3 border-gray-300 hover:border-emerald-500 px-16 py-8 rounded-full transition-all duration-1000 transform hover:scale-125 hover:shadow-2xl bg-white/90 backdrop-blur-lg hover:bg-emerald-50/90 hover:-rotate-1"
+                className="group border-2 border-gray-300 hover:border-green-500 px-12 py-6 rounded-full transition-all duration-700 transform hover:scale-110 hover:shadow-xl bg-white/80 backdrop-blur-sm"
               >
-                <Trophy className="mr-4 h-6 w-6 transition-transform duration-700 group-hover:rotate-45 group-hover:scale-110 text-amber-500" />
-                <span className="relative z-10">Take Quiz</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-cyan-100 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-700"></div>
+                <Trophy className="mr-3 h-5 w-5 transition-transform duration-500 group-hover:rotate-12" />
+                Take Quiz
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="animate-pulse">
-            <ChevronDown className="h-10 w-10 text-gray-400 hover:text-emerald-500 transition-colors duration-500 hover:scale-125 transform" />
+            <ChevronDown className="h-8 w-8 text-gray-400" />
           </div>
-          <div className="absolute -inset-2 bg-gradient-to-r from-emerald-100 to-cyan-100 rounded-full opacity-0 hover:opacity-20 transition-opacity duration-500 blur-sm"></div>
         </div>
       </section>
 
-      {/* Ultra-Enhanced Tours Section */}
-      <section id="tours" className="py-48 px-6 relative" data-animate>
+      {/* Enhanced Tours Section */}
+      <section id="tours" className="py-40 px-6 relative" data-animate>
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-32">
-            <h2 className="text-6xl md:text-8xl font-extralight text-gray-800 mb-12 tracking-[-0.02em] hover:scale-105 transition-transform duration-1000">Tours</h2>
-            <div className="w-40 h-1.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 mx-auto rounded-full shadow-lg"></div>
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-8 tracking-tighter">Tours</h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-green-500 to-blue-500 mx-auto rounded-full"></div>
           </div>
 
-          {/* Revolutionary Filter with Advanced Animation */}
-          <div className="flex justify-center mb-28">
-            <div className="flex bg-gradient-to-r from-gray-50/90 to-gray-100/90 p-3 rounded-full shadow-2xl backdrop-blur-xl border border-white/50">
+          {/* Enhanced Filter with Animation */}
+          <div className="flex justify-center mb-20">
+            <div className="flex bg-gradient-to-r from-gray-50 to-gray-100 p-2 rounded-full shadow-lg backdrop-blur-sm">
               {['all', 'morning', 'afternoon', 'evening'].map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`px-10 py-4 rounded-full transition-all duration-700 text-base font-light relative overflow-hidden ${
+                  className={`px-8 py-3 rounded-full transition-all duration-500 text-sm font-light relative overflow-hidden ${
                     activeFilter === filter 
-                      ? 'bg-gradient-to-r from-white to-gray-50 text-gray-900 shadow-2xl transform scale-110 rotate-1' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/70 hover:scale-105'
+                      ? 'bg-gradient-to-r from-white to-gray-50 text-gray-900 shadow-lg transform scale-105' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                   }`}
                 >
                   {filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}
                   {activeFilter === filter && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/60 to-cyan-100/60 rounded-full animate-pulse"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-100/50 to-blue-100/50 rounded-full animate-pulse"></div>
                   )}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Revolutionary Tour Cards */}
-          <div className="grid md:grid-cols-3 gap-12">
+          {/* Enhanced Tour Cards */}
+          <div className="grid md:grid-cols-3 gap-10">
             {filterTours(activeFilter).map((tour, index) => (
               <div 
                 key={tour.id} 
                 className="group cursor-pointer"
                 onClick={() => setSelectedTour(tour)}
-                style={{animationDelay: `${index * 300}ms`}}
+                style={{animationDelay: `${index * 200}ms`}}
               >
-                <Card className="overflow-hidden border-0 shadow-2xl hover:shadow-4xl transition-all duration-1500 transform hover:-translate-y-12 hover:rotate-2 hover:scale-105 bg-white/95 backdrop-blur-xl">
-                  <div className="relative h-80 overflow-hidden">
+                <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-1000 transform hover:-translate-y-8 hover:rotate-1 bg-white/90 backdrop-blur-sm">
+                  <div className="relative h-72 overflow-hidden">
                     <img 
                       src={tour.image} 
                       alt={tour.title}
-                      className="w-full h-full object-cover transition-transform duration-1500 group-hover:scale-140 group-hover:rotate-3"
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-125"
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${tour.color} opacity-0 group-hover:opacity-40 transition-opacity duration-1000`}></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                    <div className="absolute top-8 right-8">
-                      <Badge className="bg-white/95 backdrop-blur-xl text-gray-700 font-light border-0 px-6 py-3 rounded-full shadow-lg hover:scale-110 transition-transform duration-500">
+                    <div className={`absolute inset-0 bg-gradient-to-t ${tour.color} opacity-0 group-hover:opacity-30 transition-opacity duration-700`}></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    <div className="absolute top-6 right-6">
+                      <Badge className="bg-white/90 backdrop-blur-sm text-gray-700 font-light border-0 px-4 py-2 rounded-full">
                         {tour.difficulty}
                       </Badge>
                     </div>
                   </div>
                   
-                  <CardContent className="p-12 space-y-8">
+                  <CardContent className="p-10 space-y-6">
                     <div>
-                      <h3 className="text-4xl font-light text-gray-800 mb-3 group-hover:text-emerald-700 transition-colors duration-700">{tour.title}</h3>
-                      <p className="text-gray-500 font-light text-xl">{tour.subtitle}</p>
+                      <h3 className="text-3xl font-light text-gray-800 mb-2">{tour.title}</h3>
+                      <p className="text-gray-500 font-light text-lg">{tour.subtitle}</p>
                     </div>
                     
-                    <div className="flex items-center justify-between text-base text-gray-400">
-                      <div className="flex items-center gap-3">
-                        <Clock className="h-5 w-5 group-hover:rotate-180 transition-transform duration-700" />
+                    <div className="flex items-center justify-between text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
                         {tour.duration}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Camera className="h-5 w-5 group-hover:scale-125 transition-transform duration-700" />
+                      <div className="flex items-center gap-2">
+                        <Camera className="h-4 w-4" />
                         {tour.species.length} species
                       </div>
                     </div>
                     
-                    <div className="pt-8">
-                      <div className="flex items-center justify-between group-hover:translate-x-6 transition-transform duration-700">
-                        <span className="text-gray-600 font-light text-xl">View Details</span>
-                        <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-emerald-600 transition-all duration-700 group-hover:scale-125" />
+                    <div className="pt-6">
+                      <div className="flex items-center justify-between group-hover:translate-x-4 transition-transform duration-500">
+                        <span className="text-gray-600 font-light text-lg">View Details</span>
+                        <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-500" />
                       </div>
                     </div>
                   </CardContent>
@@ -447,37 +379,34 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Ultra-Enhanced Species Gallery */}
-      <section id="species" className="py-48 px-6 bg-gradient-to-br from-gray-50/80 via-emerald-50/40 to-cyan-50/40 relative" data-animate>
+      {/* Enhanced Species Gallery */}
+      <section id="species" className="py-40 px-6 bg-gradient-to-br from-gray-50 via-green-50/30 to-blue-50/30 relative" data-animate>
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-32">
-            <h2 className="text-6xl md:text-8xl font-extralight text-gray-800 mb-12 tracking-[-0.02em] hover:scale-105 transition-transform duration-1000">Species</h2>
-            <div className="w-40 h-1.5 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 mx-auto rounded-full shadow-lg"></div>
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-8 tracking-tighter">Species</h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-green-500 to-blue-500 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
             {birdSpecies.map((bird, index) => (
               <div 
                 key={index} 
-                className="group aspect-square relative overflow-hidden rounded-3xl bg-white shadow-2xl hover:shadow-4xl transition-all duration-1000 transform hover:-translate-y-8 hover:rotate-3 hover:scale-110"
-                style={{animationDelay: `${index * 200}ms`}}
+                className="group aspect-square relative overflow-hidden rounded-3xl bg-white shadow-lg hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-4 hover:rotate-2"
+                style={{animationDelay: `${index * 150}ms`}}
               >
                 <img 
                   src={bird.image} 
                   alt={bird.name}
-                  className="w-full h-full object-cover transition-transform duration-1500 group-hover:scale-125 group-hover:rotate-6"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <div className="absolute bottom-8 left-8 right-8 transform translate-y-12 group-hover:translate-y-0 transition-transform duration-700">
-                  <h3 className="text-white font-light text-xl mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute bottom-6 left-6 right-6 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+                  <h3 className="text-white font-light text-lg mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     {bird.name}
                   </h3>
-                  <p className="text-white/90 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                  <p className="text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                     {bird.description}
                   </p>
-                </div>
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                  <Bird className="h-6 w-6 text-white animate-pulse" />
                 </div>
               </div>
             ))}
@@ -508,6 +437,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Enhanced Footer */}
       <footer className="py-20 px-6 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-4 mb-8 group">
@@ -597,6 +527,7 @@ const Index = () => {
         </div>
       )}
 
+      {/* New Feature: Bird Quiz Modal */}
       {showQuiz && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-lg z-50 flex items-center justify-center p-6 animate-fade-in">
           <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in shadow-2xl">
@@ -642,6 +573,7 @@ const Index = () => {
         </div>
       )}
 
+      {/* New Feature: Birding Checklist Modal */}
       {showChecklist && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-lg z-50 flex items-center justify-center p-6 animate-fade-in">
           <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in shadow-2xl">
