@@ -1,65 +1,60 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, MapPin, Clock, Users, Bird, Camera, Filter, X } from 'lucide-react';
+import { ChevronDown, MapPin, Clock, Bird, Camera, Filter, X, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 const Index = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedTour, setSelectedTour] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   const tours = [
     {
       id: 1,
-      title: "Morning Birds at Arboretum",
-      description: "Discover the diverse bird species that call our beautiful arboretum home during the golden morning hours.",
-      time: "7:00 AM - 9:00 AM",
-      duration: "2 hours",
+      title: "Morning Birds",
+      subtitle: "Arboretum Dawn",
+      time: "7:00 AM",
+      duration: "2h",
       difficulty: "Easy",
-      distance: "1.2 miles",
-      species: ["Red-tailed Hawk", "Anna's Hummingbird", "American Robin", "House Finch"],
-      startPoint: "Arboretum Entrance",
-      price: "Free",
+      species: ["Red-tailed Hawk", "Anna's Hummingbird", "American Robin"],
       image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800",
-      category: "morning"
+      category: "morning",
+      color: "from-amber-400 to-orange-500"
     },
     {
       id: 2,
-      title: "Campus Central Bird Walk",
-      description: "Explore the heart of campus where urban and nature birds coexist in perfect harmony.",
-      time: "2:00 PM - 4:00 PM",
-      duration: "2 hours",
+      title: "Campus Central",
+      subtitle: "Urban Wildlife",
+      time: "2:00 PM",
+      duration: "2h",
       difficulty: "Moderate",
-      distance: "1.8 miles",
-      species: ["Cooper's Hawk", "Mourning Dove", "Western Bluebird", "California Towhee"],
-      startPoint: "Titan Student Union",
-      price: "Free",
+      species: ["Cooper's Hawk", "Mourning Dove", "Western Bluebird"],
       image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=800",
-      category: "afternoon"
+      category: "afternoon",
+      color: "from-blue-400 to-indigo-500"
     },
     {
       id: 3,
-      title: "Evening Migration Route",
-      description: "Witness the spectacular evening migration patterns along our campus corridors.",
-      time: "5:30 PM - 7:30 PM",
-      duration: "2 hours",
+      title: "Evening Migration",
+      subtitle: "Sunset Flight",
+      time: "5:30 PM",
+      duration: "2h",
       difficulty: "Easy",
-      distance: "1.5 miles",
-      species: ["Great Blue Heron", "Red-winged Blackbird", "White-crowned Sparrow"],
-      startPoint: "Campus Pond",
-      price: "Free",
+      species: ["Great Blue Heron", "Red-winged Blackbird"],
       image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800",
-      category: "evening"
+      category: "evening",
+      color: "from-purple-400 to-pink-500"
     }
   ];
 
   const birdSpecies = [
-    { name: "Red-tailed Hawk", image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400", description: "Majestic raptor commonly seen soaring over campus" },
-    { name: "Anna's Hummingbird", image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400", description: "Tiny iridescent jewels of the garden areas" },
-    { name: "American Robin", image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400", description: "Cheerful songbird found throughout campus lawns" },
-    { name: "Cooper's Hawk", image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400", description: "Agile hunter of the wooded campus areas" }
+    { name: "Red-tailed Hawk", image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400" },
+    { name: "Anna's Hummingbird", image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400" },
+    { name: "American Robin", image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400" },
+    { name: "Cooper's Hawk", image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400" }
   ];
 
   const filterTours = (category) => {
@@ -74,10 +69,12 @@ const Index = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = document.querySelectorAll('section');
+      setScrollY(window.scrollY);
+      
+      const sections = document.querySelectorAll('[data-animate]');
       sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.75) {
+        if (rect.top < window.innerHeight * 0.8) {
           section.classList.add('animate-fade-in');
         }
       });
@@ -88,390 +85,324 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-amber-50">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <Bird className="h-8 w-8 text-green-600" />
-              <span className="text-xl font-bold text-gray-800">CSUF Bird Tours</span>
+    <div className="min-h-screen bg-white overflow-hidden">
+      {/* Floating Background Elements */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-green-300 rounded-full animate-float opacity-60"></div>
+        <div className="absolute top-40 right-20 w-3 h-3 bg-blue-300 rounded-full animate-float opacity-40" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-40 left-1/4 w-1 h-1 bg-amber-300 rounded-full animate-float opacity-50" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      {/* Minimal Navigation */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-xl z-50 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3 group">
+              <div className="relative">
+                <Bird className="h-7 w-7 text-gray-800 transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute -inset-2 bg-green-100 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+              </div>
+              <span className="text-xl font-light text-gray-800 tracking-wide">CSUF Birds</span>
             </div>
             
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => scrollToSection('home')} className="text-gray-700 hover:text-green-600 transition-colors">Home</button>
-              <button onClick={() => scrollToSection('tours')} className="text-gray-700 hover:text-green-600 transition-colors">Tours</button>
-              <button onClick={() => scrollToSection('species')} className="text-gray-700 hover:text-green-600 transition-colors">Species</button>
-              <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-green-600 transition-colors">Contact</button>
+              {['Tours', 'Species', 'Contact'].map((item, index) => (
+                <button 
+                  key={item}
+                  onClick={() => scrollToSection(item.toLowerCase())}
+                  className="relative text-gray-600 hover:text-gray-900 transition-colors duration-300 group py-2"
+                  style={{animationDelay: `${index * 100}ms`}}
+                >
+                  {item}
+                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-500 group-hover:w-full transition-all duration-300"></div>
+                </button>
+              ))}
             </div>
 
-            {/* Mobile Menu Button */}
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-xl hover:bg-gray-50 transition-colors duration-300"
             >
-              <div className={`w-6 h-0.5 bg-gray-600 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
-              <div className={`w-6 h-0.5 bg-gray-600 mt-1.5 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></div>
-              <div className={`w-6 h-0.5 bg-gray-600 mt-1.5 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+              <div className="space-y-1.5">
+                <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></div>
+                <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></div>
+                <div className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></div>
+              </div>
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-4 space-y-4">
-              <button onClick={() => scrollToSection('home')} className="block w-full text-left text-gray-700 hover:text-green-600 transition-colors">Home</button>
-              <button onClick={() => scrollToSection('tours')} className="block w-full text-left text-gray-700 hover:text-green-600 transition-colors">Tours</button>
-              <button onClick={() => scrollToSection('species')} className="block w-full text-left text-gray-700 hover:text-green-600 transition-colors">Species</button>
-              <button onClick={() => scrollToSection('contact')} className="block w-full text-left text-gray-700 hover:text-green-600 transition-colors">Contact</button>
+            <div className="md:hidden pt-4 pb-2 space-y-3 animate-fade-in">
+              {['Tours', 'Species', 'Contact'].map((item) => (
+                <button 
+                  key={item}
+                  onClick={() => scrollToSection(item.toLowerCase())}
+                  className="block w-full text-left text-gray-600 hover:text-gray-900 py-2 transition-colors duration-300"
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           )}
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 via-blue-600/20 to-amber-600/20"></div>
+      {/* Hero Section - Ultra Minimal */}
+      <section className="relative min-h-screen flex items-center justify-center">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1472396961693-142e6e269027?w=1920')`,
-            transform: 'translateY(var(--scroll, 0) * 0.5)'
-          }}
+          className="absolute inset-0 bg-gradient-to-br from-green-50 via-blue-50 to-white"
+          style={{transform: `translateY(${scrollY * 0.3}px)`}}
         ></div>
         
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <div className="animate-fade-in">
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-2xl">
-              Discover Campus
-              <span className="block text-green-300">Wildlife</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow-lg">
-              Join our guided birdwatching tours and explore the incredible avian diversity right here at Cal State Fullerton
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => scrollToSection('tours')}
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg rounded-full transition-all duration-300 transform hover:scale-105"
-              >
-                Explore Tours
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => scrollToSection('species')}
-                className="bg-white/10 backdrop-blur-sm border-white/30 text-white px-8 py-4 text-lg rounded-full hover:bg-white/20 transition-all duration-300"
-              >
-                View Species
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <ChevronDown className="h-8 w-8 text-white/80" />
-        </div>
-      </section>
-
-      {/* Tours Section */}
-      <section id="tours" className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Walking Tours</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Choose from our carefully curated birdwatching experiences, each designed to showcase different aspects of campus wildlife
-            </p>
-          </div>
-
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {['all', 'morning', 'afternoon', 'evening'].map((filter) => (
-              <Button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                variant={activeFilter === filter ? "default" : "outline"}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  activeFilter === filter 
-                    ? 'bg-green-600 text-white' 
-                    : 'border-green-600 text-green-600 hover:bg-green-50'
-                }`}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                {filter.charAt(0).toUpperCase() + filter.slice(1)}
-              </Button>
-            ))}
-          </div>
-
-          {/* Tours Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filterTours(activeFilter).map((tour) => (
-              <Card key={tour.id} className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 bg-white/80 backdrop-blur-sm">
-                <div className="relative overflow-hidden rounded-t-lg">
-                  <img 
-                    src={tour.image} 
-                    alt={tour.title}
-                    className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-green-600 text-white">{tour.difficulty}</Badge>
-                  </div>
-                </div>
-                
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-800">{tour.title}</CardTitle>
-                  <CardDescription className="text-gray-600">{tour.description}</CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {tour.duration}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {tour.distance}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700">Species You'll See:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {tour.species.slice(0, 2).map((species) => (
-                        <Badge key={species} variant="secondary" className="text-xs">
-                          {species}
-                        </Badge>
-                      ))}
-                      {tour.species.length > 2 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{tour.species.length - 2} more
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={() => setSelectedTour(tour)}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full transition-all duration-300"
-                  >
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Species Gallery */}
-      <section id="species" className="py-20 px-4 bg-gradient-to-br from-blue-50 to-green-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Campus Bird Species</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Meet the feathered residents and visitors that make our campus their home
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {birdSpecies.map((bird, index) => (
-              <div key={index} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3">
-                <div className="relative overflow-hidden rounded-t-2xl">
-                  <img 
-                    src={bird.image} 
-                    alt={bird.name}
-                    className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{bird.name}</h3>
-                  <p className="text-gray-600 text-sm">{bird.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Join a Tour</h2>
-            <p className="text-xl text-gray-600">
-              Ready to explore? Contact us to reserve your spot on our next birdwatching adventure
-            </p>
-          </div>
-
-          <Card className="bg-white/80 backdrop-blur-sm shadow-2xl">
-            <CardContent className="p-8">
-              <form className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                    <input 
-                      type="text" 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300"
-                      placeholder="Your full name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input 
-                      type="email" 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Tour</label>
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300">
-                    <option>Select a tour...</option>
-                    {tours.map((tour) => (
-                      <option key={tour.id} value={tour.id}>{tour.title}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                  <textarea 
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300"
-                    placeholder="Tell us about your birdwatching experience or any special requests..."
-                  ></textarea>
-                </div>
-                
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg rounded-full transition-all duration-300 transform hover:scale-105">
-                  Reserve Your Spot
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <Bird className="h-8 w-8 text-green-400" />
-                <span className="text-xl font-bold">CSUF Bird Tours</span>
-              </div>
-              <p className="text-gray-300">
-                Connecting students and community with the natural world through guided birdwatching experiences on our beautiful campus.
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+          <div className="space-y-8 animate-fade-in">
+            <div className="space-y-4">
+              <h1 className="text-6xl md:text-8xl font-extralight text-gray-800 leading-none tracking-tight">
+                Discover
+                <span className="block text-green-600 font-light">Birds</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-500 font-light max-w-2xl mx-auto leading-relaxed">
+                Guided campus tours through Cal State Fullerton's natural habitats
               </p>
             </div>
             
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <div className="space-y-2 text-gray-300">
-                <button onClick={() => scrollToSection('tours')} className="block hover:text-green-400 transition-colors">Tours</button>
-                <button onClick={() => scrollToSection('species')} className="block hover:text-green-400 transition-colors">Species</button>
-                <button onClick={() => scrollToSection('contact')} className="block hover:text-green-400 transition-colors">Contact</button>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
-              <div className="space-y-2 text-gray-300">
-                <p>📍 California State University, Fullerton</p>
-                <p>📧 birdtours@fullerton.edu</p>
-                <p>📞 (657) 278-2011</p>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+              <Button 
+                onClick={() => scrollToSection('tours')}
+                className="group bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-full transition-all duration-500 transform hover:scale-105"
+              >
+                Explore Tours
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Button>
             </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+          <div className="animate-bounce">
+            <ChevronDown className="h-6 w-6 text-gray-400" />
+          </div>
+        </div>
+      </section>
+
+      {/* Tours Section - Minimal Cards */}
+      <section id="tours" className="py-32 px-6" data-animate>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-extralight text-gray-800 mb-6 tracking-tight">Tours</h2>
+            <div className="w-24 h-px bg-green-500 mx-auto"></div>
+          </div>
+
+          {/* Minimal Filter */}
+          <div className="flex justify-center mb-16">
+            <div className="flex bg-gray-50 p-1 rounded-full">
+              {['all', 'morning', 'afternoon', 'evening'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={`px-6 py-2 rounded-full transition-all duration-300 text-sm font-light ${
+                    activeFilter === filter 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tour Cards */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {filterTours(activeFilter).map((tour, index) => (
+              <div 
+                key={tour.id} 
+                className="group cursor-pointer"
+                onClick={() => setSelectedTour(tour)}
+                style={{animationDelay: `${index * 200}ms`}}
+              >
+                <Card className="overflow-hidden border-0 shadow-sm hover:shadow-xl transition-all duration-700 transform hover:-translate-y-4 bg-white">
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={tour.image} 
+                      alt={tour.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${tour.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-white/90 text-gray-700 font-light border-0">
+                        {tour.difficulty}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  <CardContent className="p-8 space-y-4">
+                    <div>
+                      <h3 className="text-2xl font-light text-gray-800 mb-1">{tour.title}</h3>
+                      <p className="text-gray-500 font-light">{tour.subtitle}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-400">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {tour.duration}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Camera className="h-4 w-4" />
+                        {tour.species.length} species
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <div className="flex items-center justify-between group-hover:translate-x-2 transition-transform duration-300">
+                        <span className="text-gray-600 font-light">View Details</span>
+                        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors duration-300" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Species Gallery - Minimal Grid */}
+      <section id="species" className="py-32 px-6 bg-gray-50" data-animate>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-extralight text-gray-800 mb-6 tracking-tight">Species</h2>
+            <div className="w-24 h-px bg-green-500 mx-auto"></div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {birdSpecies.map((bird, index) => (
+              <div 
+                key={index} 
+                className="group aspect-square relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all duration-500"
+                style={{animationDelay: `${index * 150}ms`}}
+              >
+                <img 
+                  src={bird.image} 
+                  alt={bird.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <h3 className="text-white font-light text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {bird.name}
+                  </h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section - Ultra Minimal */}
+      <section id="contact" className="py-32 px-6" data-animate>
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-4xl md:text-6xl font-extralight text-gray-800 mb-6 tracking-tight">Contact</h2>
+          <div className="w-24 h-px bg-green-500 mx-auto mb-16"></div>
           
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 CSUF Bird Tours. All rights reserved.</p>
+          <div className="space-y-8">
+            <p className="text-xl text-gray-500 font-light leading-relaxed">
+              Ready to explore campus wildlife?
+            </p>
+            
+            <Button className="bg-gray-900 hover:bg-gray-800 text-white px-12 py-4 rounded-full transition-all duration-500 transform hover:scale-105">
+              Book a Tour
+            </Button>
+            
+            <div className="pt-8 space-y-2 text-gray-400 font-light">
+              <p>birdtours@fullerton.edu</p>
+              <p>(657) 278-2011</p>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Minimal Footer */}
+      <footer className="py-16 px-6 border-t border-gray-100">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <Bird className="h-6 w-6 text-gray-400" />
+            <span className="text-gray-400 font-light">CSUF Bird Tours</span>
+          </div>
+          <p className="text-gray-400 text-sm font-light">
+            © 2024 California State University, Fullerton
+          </p>
         </div>
       </footer>
 
-      {/* Tour Detail Modal */}
+      {/* Enhanced Modal */}
       {selectedTour && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="relative">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto animate-scale-in">
+            <div className="relative h-64 overflow-hidden rounded-t-3xl">
               <img 
                 src={selectedTour.image} 
                 alt={selectedTour.title}
-                className="w-full h-48 object-cover rounded-t-2xl"
+                className="w-full h-full object-cover"
               />
+              <div className={`absolute inset-0 bg-gradient-to-t ${selectedTour.color} opacity-20`}></div>
               <button 
                 onClick={() => setSelectedTour(null)}
-                className="absolute top-4 right-4 bg-white/90 rounded-full p-2 hover:bg-white transition-colors"
+                className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full p-3 hover:bg-white transition-colors duration-300"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             
-            <div className="p-6 space-y-6">
+            <div className="p-8 space-y-8">
               <div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">{selectedTour.title}</h3>
-                <p className="text-gray-600">{selectedTour.description}</p>
+                <h3 className="text-3xl font-light text-gray-800 mb-2">{selectedTour.title}</h3>
+                <p className="text-gray-500 font-light text-lg">{selectedTour.subtitle}</p>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 text-green-600" />
                     <div>
-                      <p className="font-medium">Duration</p>
-                      <p className="text-sm text-gray-600">{selectedTour.duration}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium">Distance</p>
-                      <p className="text-sm text-gray-600">{selectedTour.distance}</p>
+                      <p className="font-medium text-gray-800">Duration</p>
+                      <p className="text-gray-500 font-light">{selectedTour.duration}</p>
                     </div>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-600" />
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <MapPin className="h-5 w-5 text-green-600" />
                     <div>
-                      <p className="font-medium">Difficulty</p>
-                      <p className="text-sm text-gray-600">{selectedTour.difficulty}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Camera className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium">Start Point</p>
-                      <p className="text-sm text-gray-600">{selectedTour.startPoint}</p>
+                      <p className="font-medium text-gray-800">Difficulty</p>
+                      <p className="text-gray-500 font-light">{selectedTour.difficulty}</p>
                     </div>
                   </div>
                 </div>
               </div>
               
               <div>
-                <h4 className="font-medium mb-3">Bird Species You'll Encounter:</h4>
+                <h4 className="font-medium text-gray-800 mb-4">Species You'll See</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedTour.species.map((species) => (
-                    <Badge key={species} className="bg-green-100 text-green-800">
+                    <Badge key={species} className="bg-gray-100 text-gray-700 font-light border-0 px-3 py-1">
                       {species}
                     </Badge>
                   ))}
                 </div>
               </div>
               
-              <div className="flex gap-4">
+              <div className="flex gap-4 pt-4">
                 <Button 
                   onClick={() => scrollToSection('contact')}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-full"
+                  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white rounded-full py-3 transition-all duration-300"
                 >
                   Book This Tour
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={() => setSelectedTour(null)}
-                  className="px-8 rounded-full"
+                  className="px-8 rounded-full border-gray-200 hover:bg-gray-50 transition-all duration-300"
                 >
                   Close
                 </Button>

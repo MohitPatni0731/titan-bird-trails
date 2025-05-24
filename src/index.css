@@ -7,76 +7,51 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -90,72 +65,91 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  /* Custom animations and effects */
+  /* Enhanced animations and minimal effects */
   .animate-fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
+    animation: fadeInUp 1.2s ease-out forwards;
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(60px);
   }
 
-  @keyframes fadeIn {
+  .animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  @keyframes fadeInUp {
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
 
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
+  @keyframes scaleIn {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
-  /* Custom gradient backgrounds */
-  .gradient-nature {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-
-  /* Floating animations */
+  /* Floating animations with enhanced easing */
   @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(5deg); }
+    0%, 100% { 
+      transform: translateY(0px) translateX(0px) rotate(0deg); 
+      opacity: 0.6;
+    }
+    25% { 
+      transform: translateY(-20px) translateX(10px) rotate(2deg); 
+      opacity: 0.8;
+    }
+    50% { 
+      transform: translateY(-15px) translateX(-5px) rotate(-1deg); 
+      opacity: 1;
+    }
+    75% { 
+      transform: translateY(-25px) translateX(8px) rotate(1deg); 
+      opacity: 0.7;
+    }
   }
 
   .animate-float {
-    animation: float 3s ease-in-out infinite;
+    animation: float 8s ease-in-out infinite;
   }
 
-  /* Custom hover effects */
-  .hover-lift {
-    transition: all 0.3s ease;
+  /* Smooth scrolling with enhanced behavior */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
   }
 
-  .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  }
-
-  /* Parallax effect */
-  .parallax {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-
-  /* Custom scrollbar */
+  /* Enhanced custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #16a34a;
-    border-radius: 4px;
+    background: linear-gradient(to bottom, #e5e7eb, #9ca3af);
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #15803d;
+    background: linear-gradient(to bottom, #9ca3af, #6b7280);
+  }
+
+  /* Text selection styling */
+  ::selection {
+    background: rgba(34, 197, 94, 0.2);
+    color: inherit;
+  }
+
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid #22c55e;
+    outline-offset: 2px;
   }
 }
 
@@ -165,43 +159,78 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
   }
 }
 
 @layer components {
-  .section-padding {
-    @apply py-20 px-4;
+  /* Minimal component styles */
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
   }
 
-  .container-custom {
-    @apply max-w-7xl mx-auto;
+  .minimal-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
   }
 
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2;
+  .minimal-shadow-lg {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   }
 
-  .btn-primary {
-    @apply bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105;
+  /* Enhanced hover effects */
+  .hover-lift-subtle {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .btn-secondary {
-    @apply border border-green-600 text-green-600 hover:bg-green-50 px-8 py-3 rounded-full transition-all duration-300;
+  .hover-lift-subtle:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
   }
+
+  /* Minimal button styles */
+  .btn-minimal {
+    @apply px-8 py-4 rounded-full font-light tracking-wide transition-all duration-500 transform hover:scale-105;
+  }
+
+  /* Stagger animation utilities */
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
 }
 
 @layer utilities {
-  .text-shadow {
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  /* Typography utilities */
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .backdrop-blur-custom {
-    backdrop-filter: blur(10px);
+  /* Backdrop effects */
+  .backdrop-blur-glass {
+    backdrop-filter: blur(16px) saturate(180%);
   }
 
-  .gradient-overlay {
-    background: linear-gradient(45deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1), rgba(245, 158, 11, 0.1));
+  /* Gradient utilities */
+  .gradient-text {
+    background: linear-gradient(135deg, #374151, #111827);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Animation utilities */
+  .animate-in {
+    animation-duration: 0.6s;
+    animation-fill-mode: both;
+  }
+
+  /* Enhanced transform utilities */
+  .transform-gpu {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 }
