@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, MapPin, Clock, Bird, Camera, Filter, X, ArrowRight, CheckCircle, Circle, Star, MessageSquare, Feather, Send, Sparkles, BotMessageSquare, Loader2, Upload, Search } from 'lucide-react';
+import { ChevronDown, MapPin, Clock, Bird, Camera, Filter, X, ArrowRight, CheckCircle, Circle, Star, MessageSquare, Feather, Send, Sparkles, BotMessageSquare, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Input } from "@/components/ui/input"
 
 
 // !! IMPORTANT SECURITY WARNING !!
@@ -36,14 +35,8 @@ const Index = () => {
   const [generatedPoem, setGeneratedPoem] = useState("");
   const [isAiGeneratingPoem, setIsAiGeneratingPoem] = useState(false);
   
-  // New Bird Identifier States
-  const [birdDescription, setBirdDescription] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [identificationResult, setIdentificationResult] = useState("");
-  const [isIdentifying, setIsIdentifying] = useState(false);
-  
   const [aiError, setAiError] = useState(null);
+
 
   const tours = [
     {
@@ -187,55 +180,13 @@ const Index = () => {
     }
     setIsAiGeneratingPoem(false);
   };
-
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleIdentifyBird = async () => {
-    if (!birdDescription.trim() && !selectedImage) return;
-    
-    setIsIdentifying(true);
-    setIdentificationResult("");
-    
-    let prompt;
-    if (selectedImage) {
-      // For now, we'll use description since Gemini vision requires different API setup
-      prompt = `A user has uploaded an image of a bird and described it as: "${birdDescription}". Based on this description, identify the most likely bird species. Provide the common name, a brief description, and 2-3 key identifying features. If the description is unclear, suggest what additional details might help with identification. Keep the response informative but concise.`;
-    } else {
-      prompt = `Identify the bird based on this description: "${birdDescription}". Provide its common name, a brief description, and 2-3 key identifying features. If the description is unclear, suggest what additional details might help with identification (like size, colors, habitat, behavior, etc.). Keep the response helpful and informative.`;
-    }
-    
-    const identificationText = await callGeminiAPI(prompt);
-
-    if (identificationText) {
-      setIdentificationResult(identificationText);
-    } else {
-      setIdentificationResult("I'm having trouble identifying this bird right now. Please try again with more details!");
-    }
-    setIsIdentifying(false);
-  };
-
-  const clearIdentification = () => {
-    setBirdDescription("");
-    setSelectedImage(null);
-    setImagePreview(null);
-    setIdentificationResult("");
-  };
   
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
+
 
   const filterTours = (category) => {
     if (category === 'all') return tours;
@@ -343,6 +294,7 @@ const Index = () => {
       </nav>
       
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Hero content... */}
         <div 
           className="absolute inset-0 bg-gradient-to-br from-green-50 via-blue-50 via-purple-50 to-white"
           style={{transform: `translateY(${scrollY * 0.4}px) scale(${1 + scrollY * 0.0002})`}}
@@ -385,6 +337,7 @@ const Index = () => {
       </section>
 
       <section id="tours" className="py-40 px-6 relative" data-animate>
+        {/* Tours section ... */}
          <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24">
             <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-8 tracking-tighter">Tours</h2>
@@ -463,6 +416,7 @@ const Index = () => {
       </section>
 
       <section id="species" className="py-40 px-6 bg-gradient-to-br from-gray-50 via-green-50/30 to-blue-50/30 relative" data-animate>
+        {/* Species section ... */}
          <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24">
             <h2 className="text-5xl md:text-7xl font-extralight text-gray-800 mb-8 tracking-tighter">Species</h2>
@@ -495,6 +449,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* AI Magic Section */}
       <section id="ai-magic" className="py-40 px-6 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 relative" data-animate>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-24">
@@ -514,77 +469,7 @@ const Index = () => {
           </div>
 
           <div className="space-y-16">
-            {/* AI Feature 1: Bird Identifier */}
-            <Card className="overflow-hidden border-0 shadow-xl bg-white/95 backdrop-blur-md p-6 md:p-8 group hover:shadow-2xl transition-shadow duration-500">
-              <CardHeader className="p-0 mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-tr from-emerald-400 to-teal-500 rounded-xl shadow-lg">
-                    <Search className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-2xl md:text-3xl font-light text-gray-800">Bird Identifier</CardTitle>
-                    <CardDescription className="text-gray-500 font-light">Upload a photo or describe a bird to identify it.</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-4">
-                  <Textarea 
-                    placeholder="Describe the bird you saw (e.g., 'small yellow bird with black cap', 'large brown hawk with red tail')..." 
-                    value={birdDescription}
-                    onChange={(e) => setBirdDescription(e.target.value)}
-                    className="resize-none min-h-[100px]"
-                  />
-                  
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-1">
-                      <Input 
-                        type="file" 
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="cursor-pointer"
-                      />
-                      {imagePreview && (
-                        <div className="mt-3">
-                          <img src={imagePreview} alt="Bird to identify" className="w-24 h-24 object-cover rounded-lg" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={handleIdentifyBird} 
-                        disabled={isIdentifying || (!birdDescription.trim() && !selectedImage)} 
-                        className="bg-emerald-500 hover:bg-emerald-600"
-                      >
-                        {isIdentifying ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Search className="mr-2 h-5 w-5" />}
-                        Identify
-                      </Button>
-                      {(birdDescription || selectedImage || identificationResult) && (
-                        <Button variant="outline" onClick={clearIdentification}>
-                          Clear
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  {isIdentifying && (
-                    <div className="text-center p-6">
-                      <Loader2 className="h-12 w-12 animate-spin text-emerald-500 mx-auto" />
-                      <p className="text-gray-500 mt-2">Analyzing your bird...</p>
-                    </div>
-                  )}
-
-                  {identificationResult && !isIdentifying && (
-                    <div className="mt-4 p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
-                      <h4 className="font-semibold text-emerald-800 mb-2">Identification Result:</h4>
-                      <div className="text-gray-700 whitespace-pre-line">{identificationResult}</div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Feature 2: Bird Persona Chat */}
+            {/* AI Feature 1: Bird Persona Chat */}
             <Card className="overflow-hidden border-0 shadow-xl bg-white/95 backdrop-blur-md p-6 md:p-8 group hover:shadow-2xl transition-shadow duration-500">
               <CardHeader className="p-0 mb-6">
                 <div className="flex items-center gap-4">
@@ -650,7 +535,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* AI Feature 3: Bird Poem Generator */}
+            {/* AI Feature 2: Bird Poem Generator */}
             <Card className="overflow-hidden border-0 shadow-xl bg-white/95 backdrop-blur-md p-6 md:p-8 group hover:shadow-2xl transition-shadow duration-500">
                <CardHeader className="p-0 mb-6">
                 <div className="flex items-center gap-4">
@@ -697,7 +582,9 @@ const Index = () => {
         </div>
       </section>
 
+
       <section id="contact" className="py-40 px-6" data-animate>
+        {/* Contact section ... */}
          <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-4xl md:text-6xl font-extralight text-gray-800 mb-6 tracking-tight">Contact</h2>
           <div className="w-24 h-px bg-green-500 mx-auto mb-16"></div>
@@ -717,6 +604,7 @@ const Index = () => {
       </section>
 
       <footer className="py-20 px-6 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        {/* Footer ... */}
          <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-4 mb-8 group">
             <Bird className="h-8 w-8 text-gray-400 transition-all duration-700 group-hover:scale-110 group-hover:text-green-500" />
@@ -728,6 +616,7 @@ const Index = () => {
         </div>
       </footer>
       
+      {/* Tour Modal */}
       {selectedTour && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
           <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto animate-scale-in">
@@ -811,6 +700,7 @@ const Index = () => {
         </div>
       )}
       
+      {/* Checklist Modal */}
       {showChecklist && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-lg z-50 flex items-center justify-center p-6 animate-fade-in">
           <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in shadow-2xl">
